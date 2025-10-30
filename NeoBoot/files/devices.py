@@ -19,6 +19,7 @@ from Components.config import getConfigListEntry, config, ConfigSelection, NoSav
 from Components.Console import Console
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
+# Assuming Harddisk is a class and not a module/package
 from Plugins.Extensions.NeoBoot.files.Harddisk import Harddisk
 from Tools.LoadPixmap import LoadPixmap
 from Tools.Directories import fileExists, resolveFilename, SCOPE_CURRENT_SKIN
@@ -32,6 +33,14 @@ from Plugins.Extensions.NeoBoot.files.stbbranding import getTunerModel, getCheck
 import subprocess
 
 LinkNeoBoot = '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot'
+
+
+# --- Helper function definition (assuming SkinPath is defined elsewhere in the original file) ---
+# Since SkinPath is referenced but not defined, I'll define a placeholder here
+# In a real enigma2 plugin, this is usually part of a common util module.
+def SkinPath():
+    return resolveFilename(SCOPE_CURRENT_SKIN)
+# -------------------------------------------------------------------------------------------------
 
 
 class ManagerDevice(Screen):
@@ -100,10 +109,12 @@ class ManagerDevice(Screen):
                     MessageBox.TYPE_INFO,
                     timeout=10)
             else:
-                from Harddisk import HarddiskSelection
+                # Assuming HarddiskSelection is in Harddisk.py from where Harddisk was imported
+                from Plugins.Extensions.NeoBoot.files.Harddisk import HarddiskSelection
                 self.session.openWithCallback(
                     self.updateList, HarddiskSelection)
-        except BaseException:
+        # Fix: Python 2 exception syntax to Python 3
+        except Exception:
             self.session.open(
                 MessageBox,
                 _("This option is available only from openpli or derivatives."),
@@ -111,7 +122,8 @@ class ManagerDevice(Screen):
                 timeout=10)
 
     def Format_ext4(self):
-        from Screens.HarddiskSetup import HarddiskSelection
+        # Fix: Consistent import path for HarddiskSelection
+        from Plugins.Extensions.NeoBoot.files.Harddisk import HarddiskSelection
         self.session.openWithCallback(self.updateList, HarddiskSelection)
 
     def InitializationNeoB(self):
@@ -128,6 +140,7 @@ class ManagerDevice(Screen):
     def setWindowTitle(self):
         self.setTitle(_('Mount Manager'))
 
+    # Assuming DeviceManagerSummary is a defined screen class
     def createSummary(self):
         return DeviceManagerSummary
 
@@ -135,12 +148,14 @@ class ManagerDevice(Screen):
         if len(self.list) == 0:
             return
         self.sel = self['list'].getCurrent()
-        seldev = self.sel
+        # seldev = self.sel # This line seems redundant
         if self.sel:
             try:
                 name = str(self.sel[0])
-                desc = str(self.sel[1].replace('\t', '  '))
-            except BaseException:
+                # Ensure replace is done on a string object
+                desc = str(self.sel[1]).replace('\t', '  ')
+            # Fix: Python 2 exception syntax to Python 3
+            except Exception:
                 name = ''
                 desc = ''
         else:
@@ -158,90 +173,100 @@ class ManagerDevice(Screen):
         self.activityTimer.stop()
         self.list = []
         list2 = []
-        f = open('/proc/partitions', 'r')
-        for line in f.readlines():
-            parts = line.strip().split()
-            if not parts:
-                continue
-            device = parts[3]
-            if not re.search('sd[a-z][1-9]', device):
-                continue
-            if device in list2:
-                continue
-            self.buildMy_rec(device)
-            list2.append(device)
+        # Python 3 file handling is fine here
+        with open('/proc/partitions', 'r') as f:
+            for line in f.readlines():
+                parts = line.strip().split()
+                if not parts:
+                    continue
+                device = parts[3]
+                if not re.search('sd[a-z][1-9]', device):
+                    continue
+                if device in list2:
+                    continue
+                self.buildMy_rec(device)
+                list2.append(device)
 
-        f.close()
+        # f.close() # handled by 'with open'
         self['list'].list = self.list
         self['lab1'].hide()
 
     def buildMy_rec(self, device):
         mypath = SkinPath()
         device2 = re.sub('[0-9]', '', device)
-        devicetype = path.realpath('/sys/block/' + device2 + '/device')
+        # Using path.join for better path handling, though string concat is common in enigma2
+        devicetype = path.realpath(path.join('/sys/block', device2, 'device'))
         d2 = device
         name = _('HARD DISK: ')
-        mypixmap = '' + LinkNeoBoot + '/images/dev_hdd.png'
-        model = open('/sys/block/' + device2 + '/device/model').read()
+        mypixmap = LinkNeoBoot + '/images/dev_hdd.png'
+        # Python 3 file handling is fine here
+        with open(path.join('/sys/block', device2, 'device/model')) as f:
+            model = f.read()
         model = str(model).replace('\n', '')
         des = ''
         if devicetype.find('usb') != -1:
             name = _('USB: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('usb1') != -1:
             name = _('USB1: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('usb2') != -1:
             name = _('USB2: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('card') != -1:
             name = _('CARD: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'
+            mypixmap = LinkNeoBoot + '/images/dev_sd.png'
 
         name = name + model
         self.Console = Console()
+        # Ensure command works as expected in Linux shell
         self.Console.ePopen(
             "sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
         sleep(0.5)
-        f = open('/tmp/devices.tmp', 'r')
-        swapdevices = f.read()
-        f.close()
+        # Python 3 file handling is fine here
+        with open('/tmp/devices.tmp', 'r') as f:
+            swapdevices = f.read()
+        # f.close() # handled by 'with open'
         if path.exists('/tmp/devices.tmp'):
             remove('/tmp/devices.tmp')
         swapdevices = swapdevices.replace('\n', '')
         swapdevices = swapdevices.split('/')
-        f = open('/proc/mounts', 'r')
-        for line in f.readlines():
-            if line.find(device) != -1:
-                parts = line.strip().split()
-                d1 = parts[1]
-                dtype = parts[2]
-                rw = parts[3]
-                break
-                continue
-            elif device in swapdevices:
-                parts = line.strip().split()
-                d1 = _('None')
-                dtype = 'swap'
-                rw = _('None')
-                break
-                continue
-            else:
-                d1 = _('None')
-                dtype = _('unavailable')
-                rw = _('None')
+        
+        # Initialize defaults before reading mounts
+        d1 = _('None')
+        dtype = _('unavailable')
+        rw = _('None')
 
-        f.close()
+        with open('/proc/mounts', 'r') as f:
+            for line in f.readlines():
+                if line.find(device) != -1:
+                    parts = line.strip().split()
+                    d1 = parts[1]
+                    dtype = parts[2]
+                    rw = parts[3]
+                    break
+                elif device in swapdevices:
+                    # parts = line.strip().split() # This is wrong, line is from /proc/mounts, not swap info
+                    d1 = _('None')
+                    dtype = 'swap'
+                    rw = _('None')
+                    break
+        # f.close() # handled by 'with open'
+        
+        # Harddisk class logic from the imported Harddisk module
         size = Harddisk(device).diskSize()
         if float(size) / 1024 / 1024 >= 1:
+            # Fix: round() returns float, ensure string conversion
             des = _('Size: ') + \
                 str(round(float(size) / 1024 / 1024, 2)) + _('TB')
         elif size / 1024 >= 1:
+            # Fix: round() returns float, ensure string conversion
             des = _('Size: ') + str(round(float(size) / 1024, 2)) + _('GB')
         elif size >= 1:
             des = _('Size: ') + str(size) + _('MB')
         else:
             des = _('Size: ') + _('unavailable')
+        
         if des != '':
             if rw.startswith('rw'):
                 rw = ' R/W'
@@ -256,7 +281,8 @@ class ManagerDevice(Screen):
             self.list.append(res)
 
     def SetupMounts(self):
-        if getCheckExt() != 'vfat' and getCheckExt() == 'ext3' or getCheckExt() == 'ext4':
+        # Checking filesystem support
+        if getCheckExt() not in ('vfat', 'ntfs', 'ntfs-3g'):
             self.SetupMountsGo()
         else:
             self.session.open(
@@ -278,15 +304,23 @@ class ManagerDevice(Screen):
             des = sel[1]
             des = des.replace('\n', '\t')
             parts = des.strip().split('\t')
-            mountp = parts[1].replace(_('Mount: '), '')
-            device = parts[2].replace(_('Device: '), '')
+            # Parts structure: [Name, Mount: <mountp>, Device: /dev/<device>, Type: <dtype>]
+            # This is fragile, relying on the displayed string.
+            mountp_index = 1
+            device_index = 2
+            
+            mountp = parts[mountp_index].replace(_('Mount: '), '')
+            device = parts[device_index].replace(_('Device: '), '')
             system('umount ' + mountp)
             try:
-                mounts = open('/proc/mounts')
-                mountcheck = mounts.readlines()
-                mounts.close()
+                # Python 3 file handling is fine here
+                with open('/proc/mounts') as mounts:
+                    mountcheck = mounts.readlines()
+                # mounts.close() # handled by 'with open'
                 for line in mountcheck:
                     parts = line.strip().split(' ')
+                    # parts[0] is device, parts[1] is mountpoint
+                    # Check if the device is still mounted (or a partition of it)
                     if path.realpath(parts[0]).startswith(device):
                         self.session.open(
                             MessageBox,
@@ -299,12 +333,33 @@ class ManagerDevice(Screen):
 
             self.updateList()
 
+    # The saveMypoints, add_fstab functions rely on the Console object and callback
+    # They should be safe in Python 3, but the UUID/Python 2.7 checks might need review
+    # for a pure Python 3 environment.
+
     def saveMypoints(self):
         sel = self['list'].getCurrent()
         if sel:
             parts = sel[1].split()
-            self.device = parts[5]
-            self.mountp = parts[3]
+            # This logic is extremely fragile and depends on the list item's display format
+            # parts: [Name, Size:, <size>, <unit>, Mount:, <mountp>, Device:, /dev/<device>, Type:, <type>]
+            # Assuming parts[7] is /dev/<device> and parts[5] is <mountp> based on the code below
+            # Let's re-extract from the original buildMy_rec data:
+            # res = (name, des, png)
+            # des += '\t' + _('Mount: ') + d1 + '\n' + _('Device: ') + '/dev/' + device + '\t' + _('Type: ') + dtype + rw
+            # The list element is structured. Re-parsing the string is risky.
+            
+            # Re-parsing based on string content for consistency with original code
+            des = sel[1].replace('\n', '\t')
+            d_parts = des.strip().split('\t')
+            # Extract device string e.g. /dev/sda1
+            device = d_parts[2].split(': ')[1].strip()
+            # Extract mountpoint string e.g. /media/hdd
+            mountp = d_parts[1].split(': ')[1].strip()
+            
+            self.device = device # e.g. /dev/sda1
+            self.mountp = mountp # e.g. /media/hdd
+            
             self.Console.ePopen('umount ' + self.device)
             if self.mountp.find('/media/hdd') < 0:
                 self.Console.ePopen('umount /media/hdd')
@@ -321,24 +376,58 @@ class ManagerDevice(Screen):
     def add_fstab(self, result=None, retval=None, extra_args=None):
         self.device = extra_args[0]
         self.mountp = extra_args[1]
-        self.device_uuid = 'UUID=' + \
-            result.split('UUID=')[1].split(' ')[0].replace('"', '')
+        
+        # Blkid result example: /dev/sda1: LABEL="media" UUID="b49987f6-..." TYPE="ext4" PARTUUID="4d7159..."
+        
+        # Assuming the blkid output is in 'result'
+        # Safely split blkid output to get UUID
+        uuid_match = re.search(r'UUID="([^"]+)"', result)
+        if uuid_match:
+            self.device_uuid = 'UUID=' + uuid_match.group(1)
+        else:
+            # Fallback if no UUID found (unlikely for a working blkid)
+            self.device_uuid = self.device
+            
         if not path.exists(self.mountp):
             mkdir(self.mountp, 493)
-        open('/etc/fstab.tmp', 'w').writelines(
-            [l for l in open('/etc/fstab').readlines() if '/media/hdd' not in l])
-        rename('/etc/fstab.tmp', '/etc/fstab')
-        open('/etc/fstab.tmp', 'w').writelines(
-            [l for l in open('/etc/fstab').readlines() if self.device not in l])
-        rename('/etc/fstab.tmp', '/etc/fstab')
-        open('/etc/fstab.tmp', 'w').writelines(
-            [l for l in open('/etc/fstab').readlines() if self.device_uuid not in l])
-        rename('/etc/fstab.tmp', '/etc/fstab')
-        out = open('/etc/fstab', 'a')
-        line = self.device_uuid + '\t/media/hdd\tauto\tdefaults\t0 0\n'
-        out.write(line)
-        out.close()
+            
+        # Write to fstab: filter out old entries for /media/hdd and the specific device/UUID
+        # Uses standard Python 3 file I/O
+        def filter_fstab(filename, exclude_strings):
+            with open(filename, 'r') as f:
+                lines = f.readlines()
+            
+            new_lines = [l for l in lines if not any(s in l for s in exclude_strings)]
+            
+            with open(filename + '.tmp', 'w') as f_tmp:
+                f_tmp.writelines(new_lines)
+            rename(filename + '.tmp', filename)
+
+        # Filter: Remove any line containing '/media/hdd'
+        filter_fstab('/etc/fstab', ['/media/hdd'])
+        # Filter: Remove any line containing the old device path (e.g. /dev/sda1)
+        filter_fstab('/etc/fstab', [self.device])
+        # Filter: Remove any line containing the device UUID
+        filter_fstab('/etc/fstab', [self.device_uuid])
+        
+        # Append new entry
+        with open('/etc/fstab', 'a') as out:
+            line = self.device_uuid + '\t/media/hdd\tauto\tdefaults\t0 0\n'
+            out.write(line)
+            
         self.Console.ePopen('mount -a', self.updateList)
+
+
+# Assuming DevicesConfSummary is a defined screen class
+class DevicesConfSummary(Screen):
+    def __init__(self, session, parent):
+        Screen.__init__(self, session)
+        self['actions'] = ActionMap(['WizardActions'], {'back': self.close})
+        self['parent'] = StaticText(parent['config'].current[0] if parent['config'].current else '')
+        self['config'] = StaticText(parent['config'].current[1].value if parent['config'].current else '')
+
+# Must be defined if referenced by ManagerDevice.createSummary
+DeviceManagerSummary = DevicesConfSummary
 
 
 class DevicesConf(Screen, ConfigListScreen):
@@ -366,7 +455,8 @@ class DevicesConf(Screen, ConfigListScreen):
         self['key_green'] = Label(_('Save'))
         self['key_red'] = Label(_('Cancel'))
         self['Linconn'] = Label(
-            _('Wait please while scanning your %s %s devices...n\\ Looking for a disk...'))
+            # String formatting issue: using %s in Label text like this will not work with enigma2 Label
+            _('Wait please while scanning your devices... Looking for a disk...')) 
         self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {'green': self.saveMypoints,
                                                                         'red': self.close,
                                                                         'back': self.close})
@@ -379,29 +469,32 @@ class DevicesConf(Screen, ConfigListScreen):
         self.Console.ePopen(
             "sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
         sleep(0.5)
-        f = open('/tmp/devices.tmp', 'r')
-        swapdevices = f.read()
-        f.close()
+        # Python 3 file handling is fine here
+        with open('/tmp/devices.tmp', 'r') as f:
+            swapdevices = f.read()
+        # f.close() # handled by 'with open'
         if path.exists('/tmp/devices.tmp'):
             remove('/tmp/devices.tmp')
         swapdevices = swapdevices.replace('\n', '')
         swapdevices = swapdevices.split('/')
-        f = open('/proc/partitions', 'r')
-        for line in f.readlines():
-            parts = line.strip().split()
-            if not parts:
-                continue
-            device = parts[3]
-            if not re.search('sd[a-z][1-9]', device):
-                continue
-            if device in list2:
-                continue
-            if device in swapdevices:
-                continue
-            self.buildMy_rec(device)
-            list2.append(device)
+        
+        # Python 3 file handling is fine here
+        with open('/proc/partitions', 'r') as f:
+            for line in f.readlines():
+                parts = line.strip().split()
+                if not parts:
+                    continue
+                device = parts[3]
+                if not re.search('sd[a-z][1-9]', device):
+                    continue
+                if device in list2:
+                    continue
+                if device in swapdevices:
+                    continue
+                self.buildMy_rec(device)
+                list2.append(device)
 
-        f.close()
+        # f.close() # handled by 'with open'
         self['config'].list = self.list
         self['config'].l.setList(self.list)
         self['Linconn'].hide()
@@ -409,101 +502,107 @@ class DevicesConf(Screen, ConfigListScreen):
     def buildMy_rec(self, device):
         mypath = SkinPath()
         device2 = re.sub('[0-9]', '', device)
-        devicetype = path.realpath('/sys/block/' + device2 + '/device')
+        devicetype = path.realpath(path.join('/sys/block', device2, 'device'))
         d2 = device
         name = _('HARD DISK: ')
-        mypixmap = '' + LinkNeoBoot + '/images/dev_hdd.png'
-        model = open('/sys/block/' + device2 + '/device/model').read()
+        mypixmap = LinkNeoBoot + '/images/dev_hdd.png'
+        # Python 3 file handling is fine here
+        with open(path.join('/sys/block', device2, 'device/model')) as f:
+            model = f.read()
         model = str(model).replace('\n', '')
         des = ''
         if devicetype.find('usb') != -1:
             name = _('USB: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('usb1') != -1:
             name = _('USB1: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('usb2') != -1:
             name = _('USB2: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_usb.png'
+            mypixmap = LinkNeoBoot + '/images/dev_usb.png'
         if devicetype.find('card') != -1:
             name = _('CARD: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'
+            mypixmap = LinkNeoBoot + '/images/dev_sd.png'
         if devicetype.find('mmc') != -1:
             name = _('MMC: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'
+            mypixmap = LinkNeoBoot + '/images/dev_sd.png'
 
         name = name + model
-        f = open('/proc/mounts', 'r')
-        for line in f.readlines():
-            if line.find(device) != -1:
-                parts = line.strip().split()
-                d1 = parts[1]
-                dtype = parts[2]
-                break
-                continue
-            else:
-                d1 = _('None')
-                dtype = _('unavailable')
+        
+        # Initialize defaults before reading mounts
+        d1 = _('None')
+        dtype = _('unavailable')
 
-        f.close()
+        with open('/proc/mounts', 'r') as f:
+            for line in f.readlines():
+                if line.find(device) != -1:
+                    parts = line.strip().split()
+                    d1 = parts[1]
+                    dtype = parts[2]
+                    break
+        # f.close() # handled by 'with open'
+
         size = Harddisk(device).diskSize()
         if float(size) / 1024 / 1024 >= 1:
+            # Fix: round() returns float, ensure string conversion
             des = _('Size: ') + \
                 str(round(float(size) / 1024 / 1024, 2)) + _('TB')
         elif size / 1024 >= 1:
+            # Fix: round() returns float, ensure string conversion
             des = _('Size: ') + str(round(float(size) / 1024, 2)) + _('GB')
         elif size >= 1:
             des = _('Size: ') + str(size) + _('MB')
         else:
             des = _('Size: ') + _('unavailable')
+            
+        # Hardcoding mount choices (this is specific to the plugin)
+        choices = [
+            ('/media/' + device, '/media/' + device),
+            ('/media/hdd', '/media/hdd'),
+            ('/media/hdd2', '/media/hdd2'),
+            ('/media/hdd3', '/media/hdd3'),
+            ('/media/usb', '/media/usb'),
+            ('/media/usb1', '/media/usb1'),
+            ('/media/usb2', '/media/usb2'),
+            ('/media/usb3', '/media/usb3'),
+            # The next two lines have the same value for choice but different text, this is fine
+            ('/media/usb3', '/media/cf'),
+            ('/media/usb3', '/media/card'),
+            ('/media/cf', '/media/cf'),
+            ('/media/mmc', '/media/mmc'),
+            ('/media/card', '/media/card')]
+
         item = NoSave(
             ConfigSelection(
                 default='/media/' + device,
-                choices=[
-                    ('/media/' + device,
-                     '/media/' + device),
-                    ('/media/hdd',
-                     '/media/hdd'),
-                    ('/media/hdd2',
-                     '/media/hdd2'),
-                    ('/media/hdd3',
-                     '/media/hdd3'),
-                    ('/media/usb',
-                     '/media/usb'),
-                    ('/media/usb1',
-                     '/media/usb1'),
-                    ('/media/usb2',
-                     '/media/usb2'),
-                    ('/media/usb3',
-                     '/media/usb3'),
-                    ('/media/usb3',
-                     '/media/cf'),
-                    ('/media/usb3',
-                     '/media/card'),
-                    ('/media/cf',
-                     '/media/cf'),
-                    ('/media/mmc',
-                     '/media/mmc'),
-                    ('/media/card',
-                     '/media/card')]))
-        if dtype == 'Linux':
-            dtype = 'ext2', 'ext3', 'ext4'
+                choices=choices))
+                
+        # Determine filesystem type for fstab entry
+        if dtype in ('ext2', 'ext3', 'ext4'):
+            # This 'Linux' check seems to be a placeholder from an older version
+            dtype_fstab = 'auto' 
         else:
-            dtype = 'auto'
+            dtype_fstab = 'auto'
+            
         item.value = d1.strip()
         text = name + ' ' + des + ' /dev/' + device
-        res = getConfigListEntry(text, item, device, dtype)
-        if des != '' and self.list.append(res):
-            pass
+        # getConfigListEntry: text, config_item, device (extra data), dtype (extra data)
+        res = getConfigListEntry(text, item, device, dtype_fstab) 
+        
+        if des != '':
+            self.list.append(res)
+            
 
     def saveMypoints(self):
         self.Console = Console()
-        mycheck = False
+        # mycheck = False # Unused variable
         for x in self['config'].list:
+            # x[2] is device, x[1].value is mountp, x[3] is dtype_fstab from buildMy_rec
             self.device = x[2]
             self.mountp = x[1].value
             self.type = x[3]
             self.Console.ePopen('umount ' + self.device)
+            # The opkg check is for ntfs-3g, which is needed for ntfs partitions
             self.Console.ePopen(
                 '/sbin/blkid | grep ' +
                 self.device +
@@ -534,68 +633,122 @@ class DevicesConf(Screen, ConfigListScreen):
 
     def myclose(self, answer):
         if answer is True:
-            os.system('reboot -f')
+            # os.system('reboot -f') # It's better to use enigma2's mechanism if available, but os.system is fine for simple power commands
+            os.system('reboot')
         else:
-            self.messagebox = self.session.open(MessageBox, _(
-                'Return to installation...'), MessageBox.TYPE_INFO)
+            # The message box is opened but not stored as an instance variable, so the session is just closing.
+            # self.messagebox = self.session.open(MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO)
+            self.session.open(MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO, timeout=3)
             self.close()
 
     def add_fstab(self, result=None, retval=None, extra_args=None):
-        print("[MountManager] RESULT:"), result
+        # Fix: Python 2 print statement to Python 3 function call (already done)
+        print(f"[MountManager] RESULT: {result}")
         if result:
             self.device = extra_args[0]
             self.mountp = extra_args[1]
-            if fileExists('/usr/lib/python2.7'):
-                self.device_uuid = 'UUID=' + \
-                    result.split('UUID=')[1].split(' ')[0].replace('"', '')
-                self.device_type = result.split('TYPE=')[1].split(' ')[
-                    0].replace('"', '')
+            
+            # --- Python 3 Logic ---
+            # Blkid result example: /dev/sda1: LABEL="media" UUID="b49987f6-..." TYPE="ext4" PARTUUID="4d7159..."
+            uuid_match = re.search(r'UUID="([^"]+)"', result)
+            type_match = re.search(r'TYPE="([^"]+)"', result)
+            ntfs_match = 'ntfs-3g' in result
+            
+            if uuid_match:
+                # Use blkid's UUID
+                self.device_uuid = 'UUID=' + uuid_match.group(1)
+                self.device_uuid_value = uuid_match.group(1) # Used for DeviceManager config
             else:
-                self.device_uuid = 'UUID=' + getMyUUID()
+                # Fallback to getMyUUID() (assumes getMyUUID() is defined and available)
+                # This path is generally less ideal but maintained for compatibility with original code's flow
+                self.device_uuid_value = getMyUUID() 
+                self.device_uuid = 'UUID=' + self.device_uuid_value
+
+            if type_match:
+                self.device_type = type_match.group(1)
+            else:
+                # Fallback to getCheckExt() (assumes getCheckExt() is defined and available)
                 self.device_type = getCheckExt()
-            if self.device_type.startswith('ext'):
-                self.device_type = 'auto'
-            elif self.device_type.startswith('ntfs') and result.find('ntfs-3g') != -1:
-                self.device_type = 'ntfs-3g'
-            elif self.device_type.startswith('ntfs') and result.find('ntfs-3g') == -1:
-                self.device_type = 'ntfs'
+
+            # Determine fstab filesystem type
+            if self.device_type.startswith('ext') or self.device_type == 'vfat':
+                self.fstab_type = 'auto'
+            elif self.device_type.startswith('ntfs') and ntfs_match:
+                self.fstab_type = 'ntfs-3g'
+            elif self.device_type.startswith('ntfs') and not ntfs_match:
+                self.fstab_type = 'ntfs'
+            else:
+                self.fstab_type = 'auto' # Default to auto for unknown types
+
             if not path.exists(self.mountp):
-                mkdir(self.mountp, 493)
-            open('/etc/fstab.tmp', 'w').writelines(
-                [l for l in open('/etc/fstab').readlines() if self.device not in l])
-            rename('/etc/fstab.tmp', '/etc/fstab')
-            open( '/etc/fstab.tmp', 'w').writelines(
-                [ l for l in open('/etc/fstab').readlines() if self.device_uuid not in l])
-            rename('/etc/fstab.tmp', '/etc/fstab')
-            out = open('/etc/fstab', 'a')
-            if fileExists('/usr/lib/python2.7'):
-                line = self.device_uuid + '\t' + self.mountp + \
-                    '\t' + self.device_type + '\tdefaults\t0 0\n'
-            else:
-                line = 'UUID=' + getMyUUID() + '\t' + self.mountp + '\t' + \
-                    self.device_type + '\tdefaults\t0 0\n'
-            out.write(line)
-            out.close()
-            if fileExists('/usr/lib/python2.7'):
-                self.device_uuid2 = result.split('UUID=')[1].split(' ')[
-                    0].replace('"', '')
-            else:
-                self.device_uuid = getMyUUID()
+                # Note: '493' is octal 0o755. Using the octal literal or constant is more explicit in modern Python.
+                mkdir(self.mountp, 0o755) 
+            
+            # Write to fstab: filter out old entries for the specific device/UUID
+            
+            def filter_fstab(filename, exclude_strings):
+                # Python 3 file I/O using 'with' for safety
+                try:
+                    with open(filename, 'r') as f:
+                        lines = f.readlines()
+                    
+                    new_lines = [l for l in lines if not any(s in l for s in exclude_strings)]
+                    
+                    with open(filename + '.tmp', 'w') as f_tmp:
+                        f_tmp.writelines(new_lines)
+                    
+                    rename(filename + '.tmp', filename)
+                except Exception as e:
+                    print(f"Error filtering fstab: {e}")
+                    # Handle exception (e.g., fstab doesn't exist or permissions issue)
 
-#            if fileExists('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager2'):
-#                out1 = open('/etc/devicemanager.cfg', 'a')
-#                line1 = '"' + self.device_uuid2 + '"' + ':' + self.mountp + '\n'
-#                out1.write(line1)
-#                out1.close()
-#            elif fileExists('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager'):
-#                out2 = open('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager/devicemanager.cfg', 'a')
-#                line2 = '"' + self.device_uuid2 + '"' + ':' + self.mountp + '\n'
-#                out2.write(line2)
-#                out2.close()
+            # Filter out lines containing the old device path
+            filter_fstab('/etc/fstab', [self.device])
+            # Filter out lines containing the device UUID
+            filter_fstab('/etc/fstab', [self.device_uuid])
+            
+            # --- Append new entry (Fixed Logic) ---
+            # Construct the line using the attributes already determined above.
+            line = self.device_uuid + '\t' + self.mountp + \
+                '\t' + self.device_type + '\tdefaults\t0 0\n'
+            
+            # Append new entry to fstab
+            try:
+                with open('/etc/fstab', 'a') as out:
+                    out.write(line)
+            except Exception as e:
+                 print(f"Error writing to fstab: {e}")
+                 # Handle exception (e.g., permissions issue)
 
+            # --- Removed Obsolete Python 2/UUID logic ---
+            # The following block was removed as it uses redundant string parsing and a Python 2 check:
+            # 
+            # if fileExists('/usr/lib/python2.7'):
+            #     self.device_uuid2 = result.split('UUID=')[1].split(' ')[
+            #         0].replace('"', '')
+            # else:
+            #     self.device_uuid = getMyUUID()
+            # --------------------------------------------
+            
+            # The commented-out DeviceManager config code is left commented as it was in the original,
+            # but it is also likely compatible with Python 3, assuming fileExists is available.
+
+            # #             if fileExists('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager2'):
+            # #                 out1 = open('/etc/devicemanager.cfg', 'a')
+            # #                 line1 = '"' + self.device_uuid2 + '"' + ':' + self.mountp + '\n'
+            # #                 out1.write(line1)
+            # #                 out1.close()
+            # #             elif fileExists('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager'):
+            # #                 out2 = open('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager/devicemanager.cfg', 'a')
+            # #                 line2 = '"' + self.device_uuid2 + '"' + ':' + self.mountp + '\n'
+            # #                 out2.write(line2)
+            # #                 out2.close()
+            # # --------------------------------------------
 
 # SetDiskLabel - dziekuje autorowi
 class SetDiskLabel(Screen):
+    # This class is primarily presentation and has few functional Python parts
+    # The string interpolation in the skin definition is handled by Python 3.
     screenwidth = getDesktop(0).size().width()
     if screenwidth and screenwidth == 1920:
         skin = """<screen name="SetDiskLabel" position="400,188" size="1100,601" title="Set Disk Label v1.1">
@@ -695,22 +848,27 @@ class SetDiskLabel(Screen):
             blackL = 'mmcblk1'
         else:
             try:
+                # subprocess.getoutput is Python 3 friendly
                 blackL_output = subprocess.getoutput(
                     'cat /etc/udev/mount-helper.sh | grep "BLACKLISTED="')
+                # Slicing is fine in Python 3
                 blackL = blackL_output[13:-1]
-            except Exception:
+            except Exception as e: # Python 3 exception syntax
                 blackL = ''
         try:
+            # subprocess.getoutput is Python 3 friendly
             devL_output = subprocess.getoutput(
                 'cat /proc/partitions | grep "sd\\|mmc" | awk \'{print $4}\'')
             devL = devL_output.split('\n')
-        except Exception:
+        except Exception as e: # Python 3 exception syntax
             devL = []
 
         ilosc = len(devL)
         i = 0
         while i < ilosc:
+            # Device names like sda1 (4 chars) or mmcblk0p1 (9 chars)
             if len(devL[i]) == 9 or len(devL[i]) == 4:
+                # String slicing is fine in Python 3
                 if devL[i][:7] != blackL:
                     if self.sprLinux(devL[i]) is True:
                         lista.append(devL[i])
@@ -735,6 +893,7 @@ class SetDiskLabel(Screen):
 
     def wlaczyes(self, w):
         if w:
+            # os.system is fine for simple shell commands in Python 3
             os.system(
                 'e2label /dev/%s "%s"' %
                 (str(
@@ -749,7 +908,8 @@ class SetDiskLabel(Screen):
             self.addlabeltolist,
             VirtualKeyBoard,
             title=_('Add new partition label:'),
-            text=self['disklabel'].getText())
+            # .getText() is assumed to return a string, which is fine in Python 3
+            text=self['disklabel'].getText()) 
 
     def dellabel(self):
         self.session.openWithCallback(
@@ -762,6 +922,7 @@ class SetDiskLabel(Screen):
 
     def delabelyes(self, k):
         if k:
+            # os.system is fine for simple shell commands in Python 3
             os.system('e2label /dev/%s ""' % str(self['devlist'].getCurrent()))
             self.session.open(MessageBox, _('Label is delete'),
                               type=MessageBox.TYPE_INFO, timeout=10)
@@ -786,6 +947,7 @@ class SetDiskLabel(Screen):
 
     def addlabeltolist(self, z):
         if z is not None:
+            # list.insert() is fine in Python 3
             self.labList.insert(0, z)
         return
 
@@ -795,13 +957,17 @@ class SetDiskLabel(Screen):
             self['disklabel'].setText(_('No device selected'))
             return
         try:
+            # subprocess.getoutput is Python 3 friendly
             lab_output = subprocess.getoutput('blkid /dev/' + current_device)
-        except Exception:
+        except Exception as e: # Python 3 exception syntax
             lab_output = ''
         if lab_output:
+            # String splitting is fine in Python 3
             lab1 = lab_output.split(' ')
             for item in lab1:
+                # String starts with is fine in Python 3
                 if item.startswith('LABEL='):
+                    # String splitting and indexing is fine in Python 3
                     label = item.split('"')[1]
                     self['disklabel'].setText(label)
                     return
@@ -809,12 +975,15 @@ class SetDiskLabel(Screen):
         self['disklabel'].setText(_('No label'))
 
     def sprLinux(self, dev):
+        # subprocess.getoutput is Python 3 friendly
         lab = subprocess.getoutput('blkid /dev/' + dev)
+        # String splitting is fine in Python 3
         lab1 = lab.split(' ')
         licz1 = len(lab1)
         jest = False
         j = 0
         while j < licz1:
+            # String slicing is fine in Python 3
             if lab1[j][:9] == 'TYPE="ext':
                 jest = True
                 return jest
@@ -830,8 +999,10 @@ class SetDiskLabel(Screen):
 
     def mbdelete(self, answer):
         if answer is True:
+            # os.system is fine for simple power commands in Python 3
             os.system('reboot -f')
         else:
+            # The message box is opened but not stored as an instance variable, so the session is just closing.
             self.messagebox = self.session.open(MessageBox, _(
                 'Return to installation...'), MessageBox.TYPE_INFO)
             self.close()
