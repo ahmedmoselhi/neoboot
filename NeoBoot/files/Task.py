@@ -116,7 +116,8 @@ class Job(object):
         self.abort()
 
     def __str__(self):
-        return 'Components.Task.Job name=%s #tasks=%s' % (self.name, len(self.tasks))
+        return 'Components.Task.Job name=%s #tasks=%s' % (
+            self.name, len(self.tasks))
 
 
 class Task(object):
@@ -388,12 +389,15 @@ class JobManager:
         from Tools import Notifications
         from Screens.MessageBox import MessageBox
         if problems[0].RECOVERABLE:
-            Notifications.AddNotificationWithCallback(self.errorCB, MessageBox, _(
-                'Error: %s\nRetry?') % problems[0].getErrorMessage(task))
+            Notifications.AddNotificationWithCallback(
+                self.errorCB, MessageBox, _('Error: %s\nRetry?') %
+                problems[0].getErrorMessage(task))
             return True
         else:
-            Notifications.AddNotification(MessageBox, job.name + '\n' + _(
-                'Error') + ': %s' % problems[0].getErrorMessage(task), type=MessageBox.TYPE_ERROR)
+            Notifications.AddNotification(
+                MessageBox,
+                job.name + '\n' + _('Error') + ': %s' % problems[0].getErrorMessage(task),
+                type=MessageBox.TYPE_ERROR)
             return False
 
     def jobDone(self, job, task, problems):
@@ -438,7 +442,8 @@ class Condition:
     RECOVERABLE = False
 
     def getErrorMessage(self, task):
-        return _('An unknown error occurred!') + ' (%s @ task %s)' % (self.__class__.__name__, task.__class__.__name__)
+        return _('An unknown error occurred!') + \
+            ' (%s @ task %s)' % (self.__class__.__name__, task.__class__.__name__)
 
 
 class WorkspaceExistsPrecondition(Condition):
@@ -463,7 +468,8 @@ class DiskspacePrecondition(Condition):
             return False
 
     def getErrorMessage(self, task):
-        return _('Not enough disk space. Please free up some disk space and try again. (%d MB required, %d MB available)') % (self.diskspace_required / 1024 / 1024, self.diskspace_available / 1024 / 1024)
+        return _('Not enough disk space. Please free up some disk space and try again. (%d MB required, %d MB available)') % (
+            self.diskspace_required / 1024 / 1024, self.diskspace_available / 1024 / 1024)
 
 
 class ToolExistsPrecondition(Condition):
@@ -478,8 +484,15 @@ class ToolExistsPrecondition(Condition):
         self.realpath = task.cmd
         path = os.environ.get('PATH', '').split(os.pathsep)
         path.append(task.cwd + '/')
-        absolutes = [file for file in map(lambda directory, file=task.cmd: os.path.join(
-            directory, file), path) if os.access(file, os.X_OK)]
+        absolutes = [
+            file for file in map(
+                lambda directory,
+                file=task.cmd: os.path.join(
+                    directory,
+                    file),
+                path) if os.access(
+                file,
+                os.X_OK)]
         if absolutes:
             self.realpath = absolutes[0]
             return True

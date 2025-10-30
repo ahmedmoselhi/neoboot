@@ -244,7 +244,8 @@ MyUpgradeHD = """
                 </screen>"""
 
 
-# ____ Skin NeoBootInstallationFULLHD - NeoBootInstallationFULLHD ___mod. gutosie ___
+# ____ Skin NeoBootInstallationFULLHD - NeoBootInstallationFULLHD ___mod.
+# gutosie ___
 NeoBootInstallationFULLHD = """
 <screen name="NeoBootInstallationFULLHD" position="410,138" size="1200,850" title="NeoBoot">
         <ePixmap position="643,282" zPosition="-2" size="531,331" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/images/matrix.png" />
@@ -269,7 +270,8 @@ NeoBootInstallationFULLHD = """
         <widget name="key_blue" position="856,761" zPosition="1" size="326,52" font="dugme; 28" halign="center" valign="center" backgroundColor="blue" transparent="1" foregroundColor="blue" />
         </screen>"""
 
-# ____ Skin NeoBootInstallationUltraHD - NeoBootInstallationUltraHD ___mod. gutosie ___
+# ____ Skin NeoBootInstallationUltraHD - NeoBootInstallationUltraHD
+# ___mod. gutosie ___
 NeoBootInstallationUltraHD = """
 <screen name="NeoBootInstallationUltraHD" position="0,0" size="3840,2160" flags="wfNoBorder" backgroundColor="#ff111111">
         <widget source="Title" render="Label" position="174,108" size="1575,150" font="baslk;102" valign="bottom" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" noWrap="1" transparent="1" />
@@ -278,7 +280,7 @@ NeoBootInstallationUltraHD = """
 
         <widget name="label4" position="13,632" size="298,55" zPosition="1" halign="center" font="dugme;28" backgroundColor="black" transparent="1" foregroundColor="#ffffff" />
         <widget name="label5" position="13,686" size="298,48" zPosition="1" halign="center" font="dugme;28" backgroundColor="black" transparent="1" foregroundColor="#ffffff" />
-        
+
         <widget name="config" position="210,690" size="2100,540" itemHeight="108" font="genel;60" zPosition="2" scrollbarMode="showOnDemand" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" foregroundColorSelected="#00FFFFF" backgroundColorSelected="#1A27408B" scrollbarSliderBorderWidth="1" scrollbarWidth="8" scrollbarSliderForegroundColor="#00FFFFFF" scrollbarSliderBorderColor="#0027408B" enableWrapAround="1" transparent="1" />
         <eLabel position="210,1470" size="2100,3" backgroundColor="#0027408B" />
         <widget name="label3" position="150,1500" size="2100,90" font="genel;60" halign="center" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" zPosition="1" transparent="1" />
@@ -323,5 +325,5 @@ NeoBootInstallationHD = """
   <widget name="label3" position="20,339" size="816,61" zPosition="1" halign="center" font="Regular;24" backgroundColor="black" transparent="1" foregroundColor="#58ccff" />
   <widget name="label4" position="49,451" size="288,32" zPosition="1" halign="center" font="dugme;22" backgroundColor="black" transparent="1" foregroundColor="#ffffff" />
   <widget name="label5" position="376,452" size="293,32" zPosition="1" halign="center" font="dugme;22" backgroundColor="black" transparent="1" foregroundColor="#ffffff" />
-  <widget name="label6" position="540,54" size="293,32" zPosition="1" halign="center" font="dugme;22" backgroundColor="black" transparent="1" foregroundColor="#ffffff" /> 
+  <widget name="label6" position="540,54" size="293,32" zPosition="1" halign="center" font="dugme;22" backgroundColor="black" transparent="1" foregroundColor="#ffffff" />
   </screen>"""

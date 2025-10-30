@@ -19,7 +19,13 @@ class Console(Screen):
 #    def __init__(self, session, title = 'Console', cmdlist = None, finishedCallback = None, closeOnSuccess = False):
 #        Screen.__init__(self, session)
 
-    def __init__(self, session, title=_('Console'), cmdlist=None, finishedCallback=None, closeOnSuccess=False):
+    def __init__(
+            self,
+            session,
+            title=_('Console'),
+            cmdlist=None,
+            finishedCallback=None,
+            closeOnSuccess=False):
         Screen.__init__(self, session)
         self.finishedCallback = finishedCallback
         self.closeOnSuccess = closeOnSuccess
@@ -28,12 +34,16 @@ class Console(Screen):
         self['key_green'] = Label(_('Hide Console'))
         self['text'] = ScrollLabel('')
         self['summary_description'] = StaticText('')
-        self['actions'] = ActionMap(['WizardActions', 'DirectionActions', 'ColorActions'], {'ok': self.cancel,
-                                                                                            'back': self.cancel,
-                                                                                            'up': self.key_up,
-                                                                                            'down': self.key_down,
-                                                                                            'green': self.key_green,
-                                                                                            'red': self.key_red}, -1)
+        self['actions'] = ActionMap(['WizardActions',
+                                     'DirectionActions',
+                                     'ColorActions'],
+                                    {'ok': self.cancel,
+                                     'back': self.cancel,
+                                     'up': self.key_up,
+                                     'down': self.key_down,
+                                     'green': self.key_green,
+                                     'red': self.key_red},
+                                    -1)
         self.cmdlist = cmdlist
         self.newtitle = title
         self.screen_hide = False
@@ -140,8 +150,13 @@ class Console(Screen):
         lt = localtime(time())
         self.output_file = '/tmp/%02d%02d%02d_console.txt' % (
             lt[3], lt[4], lt[5])
-        self.session.openWithCallback(self.saveOutputTextCB, MessageBox, _(
-            "Save the commands and the output to a file?\n('%s')") % self.output_file, type=MessageBox.TYPE_YESNO, default=True)
+        self.session.openWithCallback(
+            self.saveOutputTextCB,
+            MessageBox,
+            _("Save the commands and the output to a file?\n('%s')") %
+            self.output_file,
+            type=MessageBox.TYPE_YESNO,
+            default=True)
 
     def formatCmdList(self, source):
         if isinstance(source, (list, tuple)):
@@ -174,7 +189,7 @@ class Console(Screen):
                     if len(cmdlist) > 1:
                         text += 'next commands:\n\n' + \
                             '\n'.join(cmdlist[1:]) + '\n\n'
-                except:
+                except BaseException:
                     text += 'error read commands!!!\n\n'
 
                 text += '-' * 50 + \
@@ -185,7 +200,7 @@ class Console(Screen):
                     f.close()
                     self['key_green'].setText(_('Load'))
                     return
-                except:
+                except BaseException:
                     failtext = _("File write error: '%s'") % self.output_file
 
             self.output_file = 'end'
@@ -206,7 +221,7 @@ class Console(Screen):
             with open(file, 'r') as rdfile:
                 rd = rdfile.read()
             rdfile.close()
-        except:
+        except BaseException:
             if file == self.output_file:
                 rd = self['text'].getText()
             else:

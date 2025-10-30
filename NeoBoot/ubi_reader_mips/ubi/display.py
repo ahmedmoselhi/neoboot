@@ -11,8 +11,10 @@ def ubi(ubi, tab=''):
     print(('\t%sTotal Block Count: %s' % (tab, ubi.block_count)))
     print(('\t%sData Block Count: %s' % (tab, len(ubi.data_blocks_list))))
     print(('\t%sLayout Block Count: %s' % (tab, len(ubi.layout_blocks_list))))
-    print(('\t%sInternal Volume Block Count: %s' % (tab, len(ubi.int_vol_blocks_list))))
-    print(('\t%sUnknown Block Count: %s' % (tab, len(ubi.unknown_blocks_list))))
+    print(('\t%sInternal Volume Block Count: %s' %
+          (tab, len(ubi.int_vol_blocks_list))))
+    print(('\t%sUnknown Block Count: %s' %
+          (tab, len(ubi.unknown_blocks_list))))
     print(('\t%sFirst UBI PEB Number: %s' % (tab, ubi.first_peb_num)))
 
 
@@ -23,7 +25,8 @@ def image(image, tab=''):
     for volume in image.volumes:
         print(('\t%sVolume Name:%s' % (tab, volume)))
 
-    print(('\t%sPEB Range: %s - %s' % (tab, image.peb_range[0], image.peb_range[1])))
+    print(('\t%sPEB Range: %s - %s' %
+          (tab, image.peb_range[0], image.peb_range[1])))
 
 
 def volume(volume, tab=''):

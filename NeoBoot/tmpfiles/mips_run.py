@@ -68,8 +68,8 @@ class StartImage(Screen):
         self.list = []
         self['list'] = List(self.list)
         self.select()
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {'ok': self.KeyOk,
-                                                                        'back': self.close})
+        self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {
+                                    'ok': self.KeyOk, 'back': self.close})
         self['label1'] = Label(_('Start the chosen system now ?'))
         self['label2'] = Label(_('Select OK to run the image.'))
 
@@ -99,7 +99,9 @@ class StartImage(Screen):
 
     def StartImageInNeoBoot(self):
         if getImageNeoBoot() != 'Flash':
-            if fileExists('%sImageBoot/%s/.control_ok' % (getNeoLocation(), getImageNeoBoot())):
+            if fileExists(
+                '%sImageBoot/%s/.control_ok' %
+                    (getNeoLocation(), getImageNeoBoot())):
                 system('touch /tmp/.control_ok ')
             else:
                 system('touch %sImageBoot/%s/.control_boot_new_image ' %
@@ -132,23 +134,32 @@ class StartImage(Screen):
                 else:
                     os.system('echo "Flash "  >> ' +
                               getNeoLocation() + 'ImageBoot/.neonextboot')
-                    self.messagebox = self.session.open(MessageBox, _(
-                        'It looks like it that multiboot does not support this STB.'), MessageBox.TYPE_INFO, 8)
+                    self.messagebox = self.session.open(
+                        MessageBox,
+                        _('It looks like it that multiboot does not support this STB.'),
+                        MessageBox.TYPE_INFO,
+                        8)
                     self.close()
 
             else:
                 os.system('echo "Flash "  >> ' + getNeoLocation() +
                           'ImageBoot/.neonextboot')
-                self.messagebox = self.session.open(MessageBox, _(
-                    'It looks like it that multiboot does not support this STB.'), MessageBox.TYPE_INFO, 8)
+                self.messagebox = self.session.open(
+                    MessageBox,
+                    _('It looks like it that multiboot does not support this STB.'),
+                    MessageBox.TYPE_INFO,
+                    8)
                 self.close()
 
 
 def getTurnOffOnSystem():
     for line in open("/etc/hostname"):
         if "dm500hd" in line or "dm800se" in line or "dm800" in line or "dm800se" in line or "dm8000" in line:
-            if fileExists('%sImageBoot/%s/squashfs-images' % (getNeoLocation(), getImageNeoBoot())):
-                os.system('ln -sf "%sImageBoot/%s/squashfs-images" "//squashfs-images"' %
-                          (getNeoLocation(), getImageNeoBoot()))
+            if fileExists(
+                '%sImageBoot/%s/squashfs-images' %
+                    (getNeoLocation(), getImageNeoBoot())):
+                os.system(
+                    'ln -sf "%sImageBoot/%s/squashfs-images" "//squashfs-images"' %
+                    (getNeoLocation(), getImageNeoBoot()))
         os.system(
             'echo 3 > /proc/sys/vm/drop_caches; shutdown now -r; reboot -f -d -h -i')

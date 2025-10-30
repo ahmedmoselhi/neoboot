@@ -45,7 +45,10 @@ def extract_blocks(ubi):
     ubi.file.seek(ubi.file.start_offset)
     peb_count = 0
     cur_offset = 0
-    for i in range(ubi.file.start_offset, ubi.file.end_offset, ubi.file.block_size):
+    for i in range(
+            ubi.file.start_offset,
+            ubi.file.end_offset,
+            ubi.file.block_size):
         buf = ubi.file.read(ubi.file.block_size)
         if buf.startswith(UBI_EC_HDR_MAGIC):
             blk = description(buf)

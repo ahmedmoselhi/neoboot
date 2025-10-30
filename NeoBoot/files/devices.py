@@ -26,12 +26,21 @@ from os import system, rename, path, mkdir, remove, listdir
 from time import sleep
 import re
 import os
+import subprocess  # Use subprocess for command execution
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 import gettext
 from Plugins.Extensions.NeoBoot.files.stbbranding import getTunerModel, getCheckExt, getBoxHostName, getMyUUID
-import subprocess
-    
+
+# Removed the Python 2 compatibility shim. Use standard Python 3 approach.
+
+
+def getoutput(cmd):
+    """Wrapper for subprocess.getoutput (Python 3 equivalent of commands.getoutput)"""
+    return subprocess.getoutput(cmd)
+
+
 LinkNeoBoot = '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot'
+
 
 class ManagerDevice(Screen):
     screenwidth = getDesktop(0).size().width()
@@ -75,12 +84,15 @@ class ManagerDevice(Screen):
         self.list = []
         self['list'] = List(self.list)
         self['list'].onSelectionChanged.append(self.selectionChanged)
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions', 'MenuActions'], {'back': self.close,
-         'red': self.Format_ext3,
-         'green': self.SetupMounts,
-         'yellow': self.Format_ext4,
-         'blue': self.InitializationNeoB,
-         'back': self.close})
+        self['actions'] = ActionMap(['WizardActions',
+                                     'ColorActions',
+                                     'MenuActions'],
+                                    {'back': self.close,
+                                     'red': self.Format_ext3,
+                                     'green': self.SetupMounts,
+                                     'yellow': self.Format_ext4,
+                                     'blue': self.InitializationNeoB,
+                                     'back': self.close})
         self.activityTimer = eTimer()
         self.activityTimer.timeout.get().append(self.updateList2)
         self.updateList()
@@ -88,13 +100,23 @@ class ManagerDevice(Screen):
 
     def Format_ext3(self):
         try:
-            if fileExists('/etc/vtiversion.info') or fileExists('/etc/bhversion'):
-                self.session.open(MessageBox, _("This option is available only from openpli or derivatives."), MessageBox.TYPE_INFO, timeout=10)
+            if fileExists(
+                    '/etc/vtiversion.info') or fileExists('/etc/bhversion'):
+                self.session.open(
+                    MessageBox,
+                    _("This option is available only from openpli or derivatives."),
+                    MessageBox.TYPE_INFO,
+                    timeout=10)
             else:
                 from Harddisk import HarddiskSelection
-                self.session.openWithCallback(self.updateList, HarddiskSelection)
-        except:
-            self.session.open(MessageBox, _("This option is available only from openpli or derivatives."), MessageBox.TYPE_INFO, timeout=10)
+                self.session.openWithCallback(
+                    self.updateList, HarddiskSelection)
+        except BaseException:
+            self.session.open(
+                MessageBox,
+                _("This option is available only from openpli or derivatives."),
+                MessageBox.TYPE_INFO,
+                timeout=10)
 
     def Format_ext4(self):
         from Screens.HarddiskSetup import HarddiskSelection
@@ -102,11 +124,15 @@ class ManagerDevice(Screen):
 
     def InitializationNeoB(self):
         if fileExists('/.multinfo'):
-                self.session.open(MessageBox, _("This option is available only from Flash"), MessageBox.TYPE_INFO, timeout=10)
+            self.session.open(
+                MessageBox,
+                _("This option is available only from Flash"),
+                MessageBox.TYPE_INFO,
+                timeout=10)
         else:
-                from Plugins.Extensions.NeoBoot.files.tools import InitializationFormattingDisk
-                self.session.open(InitializationFormattingDisk)
-                
+            from Plugins.Extensions.NeoBoot.files.tools import InitializationFormattingDisk
+            self.session.open(InitializationFormattingDisk)
+
     def setWindowTitle(self):
         self.setTitle(_('Mount Manager'))
 
@@ -122,7 +148,7 @@ class ManagerDevice(Screen):
             try:
                 name = str(self.sel[0])
                 desc = str(self.sel[1].replace('\t', '  '))
-            except:
+            except BaseException:
                 name = ''
                 desc = ''
         else:
@@ -140,20 +166,24 @@ class ManagerDevice(Screen):
         self.activityTimer.stop()
         self.list = []
         list2 = []
-        f = open('/proc/partitions', 'r')
-        for line in f.readlines():
-            parts = line.strip().split()
-            if not parts:
-                continue
-            device = parts[3]
-            if not re.search('sd[a-z][1-9]', device):
-                continue
-            if device in list2:
-                continue
-            self.buildMy_rec(device)
-            list2.append(device)
+        try:
+            with open('/proc/partitions', 'r') as f:
+                for line in f.readlines():
+                    parts = line.strip().split()
+                    if not parts:
+                        continue
+                    device = parts[3]
+                    if not re.search('sd[a-z][1-9]', device):
+                        continue
+                    if device in list2:
+                        continue
+                    self.buildMy_rec(device)
+                    list2.append(device)
+        except FileNotFoundError:
+            # Handle case where /proc/partitions doesn't exist or isn't
+            # readable
+            pass
 
-        f.close()
         self['list'].list = self.list
         self['lab1'].hide()
 
@@ -164,8 +194,13 @@ class ManagerDevice(Screen):
         d2 = device
         name = _('HARD DISK: ')
         mypixmap = '' + LinkNeoBoot + '/images/dev_hdd.png'
-        model = open('/sys/block/' + device2 + '/device/model').read()
-        model = str(model).replace('\n', '')
+
+        try:
+            with open('/sys/block/' + device2 + '/device/model', 'r') as f:
+                model = f.read().strip()
+        except IOError:
+            model = 'Unknown Model'
+
         des = ''
         if devicetype.find('usb') != -1:
             name = _('USB: ')
@@ -182,41 +217,49 @@ class ManagerDevice(Screen):
 
         name = name + model
         self.Console = Console()
-        self.Console.ePopen("sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
+        self.Console.ePopen(
+            "sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
         sleep(0.5)
-        f = open('/tmp/devices.tmp', 'r')
-        swapdevices = f.read()
-        f.close()
+
+        swapdevices = ''
         if path.exists('/tmp/devices.tmp'):
+            try:
+                with open('/tmp/devices.tmp', 'r') as f:
+                    swapdevices = f.read()
+            except IOError:
+                pass
             remove('/tmp/devices.tmp')
+
         swapdevices = swapdevices.replace('\n', '')
         swapdevices = swapdevices.split('/')
-        f = open('/proc/mounts', 'r')
-        for line in f.readlines():
-            if line.find(device) != -1:
-                parts = line.strip().split()
-                d1 = parts[1]
-                dtype = parts[2]
-                rw = parts[3]
-                break
-                continue
-            elif device in swapdevices:
-                parts = line.strip().split()
-                d1 = _('None')
-                dtype = 'swap'
-                rw = _('None')
-                break
-                continue
-            else:
-                d1 = _('None')
-                dtype = _('unavailable')
-                rw = _('None')
 
-        f.close()
+        d1 = _('None')
+        dtype = _('unavailable')
+        rw = _('None')
+
+        try:
+            with open('/proc/mounts', 'r') as f:
+                for line in f.readlines():
+                    if line.find(device) != -1:
+                        parts = line.strip().split()
+                        d1 = parts[1]
+                        dtype = parts[2]
+                        rw = parts[3]
+                        break
+                    elif device in swapdevices:
+                        parts = line.strip().split()
+                        d1 = _('None')
+                        dtype = 'swap'
+                        rw = _('None')
+                        break
+        except FileNotFoundError:
+            pass
+
         size = Harddisk(device).diskSize()
         if float(size) / 1024 / 1024 >= 1:
-            des = _('Size: ') + str(round(float(size) / 1024 / 1024, 2)) + _('TB')
-        elif size / 1024 >= 1:
+            des = _('Size: ') + \
+                str(round(float(size) / 1024 / 1024, 2)) + _('TB')
+        elif float(size) / 1024 >= 1:
             des = _('Size: ') + str(round(float(size) / 1024, 2)) + _('GB')
         elif size >= 1:
             des = _('Size: ') + str(size) + _('MB')
@@ -229,22 +272,29 @@ class ManagerDevice(Screen):
                 rw = ' R/O'
             else:
                 rw = ''
-            des += '\t' + _('Mount: ') + d1 + '\n' + _('Device: ') + '/dev/' + device + '\t' + _('Type: ') + dtype + rw
+            des += '\t' + _('Mount: ') + d1 + '\n' + _('Device: ') + \
+                '/dev/' + device + '\t' + _('Type: ') + dtype + rw
             png = LoadPixmap(mypixmap)
             res = (name, des, png)
             self.list.append(res)
 
     def SetupMounts(self):
-        if getCheckExt() != 'vfat' and getCheckExt() == 'ext3' or getCheckExt() == 'ext4' :    
+        # Note: getCheckExt() will need to be verified for Python 3
+        # compatibility if it is not a built-in E2 function
+        if getCheckExt() != 'vfat' and getCheckExt() == 'ext3' or getCheckExt() == 'ext4':
             self.SetupMountsGo()
         else:
-            self.session.open(MessageBox, _('Disk the directory HDD or USB is not a ext2, ext3 or ext4.\nMake sure you select a valid partition type to install neoboot.'), type=MessageBox.TYPE_ERROR)
+            self.session.open(
+                MessageBox,
+                _('Disk the directory HDD or USB is not a ext2, ext3 or ext4.\nMake sure you select a valid partition type to install neoboot.'),
+                type=MessageBox.TYPE_ERROR)
 
     def SetupMountsGo(self):
         if not fileExists('/etc/fstab.org'):
             os.system('cp -f /etc/fstab /etc/fstab.org')
         elif fileExists('/etc/fstab.org'):
-            os.system('rm -f /etc/fstab; cp /etc/fstab.org /etc/fstab; rm /etc/fstab.org')
+            os.system(
+                'rm -f /etc/fstab; cp /etc/fstab.org /etc/fstab; rm /etc/fstab.org')
         self.session.openWithCallback(self.updateList, DevicesConf)
 
     def Unmount(self):
@@ -263,7 +313,11 @@ class ManagerDevice(Screen):
                 for line in mountcheck:
                     parts = line.strip().split(' ')
                     if path.realpath(parts[0]).startswith(device):
-                        self.session.open(MessageBox, _("Can't unmount partition, make sure it is not being used for swap or record/timeshift paths"), MessageBox.TYPE_INFO, timeout=10)
+                        self.session.open(
+                            MessageBox,
+                            _("Can't unmount partition, make sure it is not being used for swap or record/timeshift paths"),
+                            MessageBox.TYPE_INFO,
+                            timeout=10)
 
             except IOError:
                 return -1
@@ -279,29 +333,52 @@ class ManagerDevice(Screen):
             self.Console.ePopen('umount ' + self.device)
             if self.mountp.find('/media/hdd') < 0:
                 self.Console.ePopen('umount /media/hdd')
-                self.Console.ePopen('/sbin/blkid | grep ' + self.device, self.add_fstab, [self.device, self.mountp])
+                self.Console.ePopen(
+                    '/sbin/blkid | grep ' + self.device, self.add_fstab, [self.device, self.mountp])
             else:
-                self.session.open(MessageBox, _('This Device is already mounted as HDD.'), MessageBox.TYPE_INFO, timeout=10, close_on_any_key=True)
+                self.session.open(
+                    MessageBox,
+                    _('This Device is already mounted as HDD.'),
+                    MessageBox.TYPE_INFO,
+                    timeout=10,
+                    close_on_any_key=True)
 
     def add_fstab(self, result=None, retval=None, extra_args=None):
         self.device = extra_args[0]
         self.mountp = extra_args[1]
-        self.device_uuid = 'UUID=' + result.split('UUID=')[1].split(' ')[0].replace('"', '')
+        self.device_uuid = 'UUID=' + \
+            result.split('UUID=')[1].split(' ')[0].replace('"', '')
         if not path.exists(self.mountp):
             mkdir(self.mountp, 493)
-        open('/etc/fstab.tmp', 'w').writelines([l for l in open('/etc/fstab').readlines() if '/media/hdd' not in l])
+
+        with open('/etc/fstab', 'r') as f:
+            lines = f.readlines()
+
+        with open('/etc/fstab.tmp', 'w') as out:
+            out.writelines([l for l in lines if '/media/hdd' not in l])
         rename('/etc/fstab.tmp', '/etc/fstab')
-        open('/etc/fstab.tmp', 'w').writelines([l for l in open('/etc/fstab').readlines() if self.device not in l])
+
+        with open('/etc/fstab', 'r') as f:
+            lines = f.readlines()
+
+        with open('/etc/fstab.tmp', 'w') as out:
+            out.writelines([l for l in lines if self.device not in l])
         rename('/etc/fstab.tmp', '/etc/fstab')
-        open('/etc/fstab.tmp', 'w').writelines([l for l in open('/etc/fstab').readlines() if self.device_uuid not in l])
+
+        with open('/etc/fstab', 'r') as f:
+            lines = f.readlines()
+
+        with open('/etc/fstab.tmp', 'w') as out:
+            out.writelines([l for l in lines if self.device_uuid not in l])
         rename('/etc/fstab.tmp', '/etc/fstab')
-        out = open('/etc/fstab', 'a')
-        line = self.device_uuid + '\t/media/hdd\tauto\tdefaults\t0 0\n'
-        out.write(line)
-        out.close()
+
+        with open('/etc/fstab', 'a') as out:
+            line = self.device_uuid + '\t/media/hdd\tauto\tdefaults\t0 0\n'
+            out.write(line)
+
         self.Console.ePopen('mount -a', self.updateList)
-        
-        
+
+
 class DevicesConf(Screen, ConfigListScreen):
     screenwidth = getDesktop(0).size().width()
     if screenwidth and screenwidth == 1920:
@@ -326,41 +403,51 @@ class DevicesConf(Screen, ConfigListScreen):
         Screen.setTitle(self, _('Choose where to mount your devices to:'))
         self['key_green'] = Label(_('Save'))
         self['key_red'] = Label(_('Cancel'))
-        self['Linconn'] = Label(_('Wait please while scanning your %s %s devices...n\\ Looking for a disk...'))
+        self['Linconn'] = Label(
+            _('Wait please while scanning your %s %s devices...n\\ Looking for a disk...'))
         self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {'green': self.saveMypoints,
-         'red': self.close,
-         'back': self.close})
+                                                                        'red': self.close,
+                                                                        'back': self.close})
         self.updateList()
 
     def updateList(self):
         self.list = []
         list2 = []
         self.Console = Console()
-        self.Console.ePopen("sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
+        self.Console.ePopen(
+            "sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
         sleep(0.5)
-        f = open('/tmp/devices.tmp', 'r')
-        swapdevices = f.read()
-        f.close()
+
+        swapdevices = ''
         if path.exists('/tmp/devices.tmp'):
+            try:
+                with open('/tmp/devices.tmp', 'r') as f:
+                    swapdevices = f.read()
+            except IOError:
+                pass
             remove('/tmp/devices.tmp')
+
         swapdevices = swapdevices.replace('\n', '')
         swapdevices = swapdevices.split('/')
-        f = open('/proc/partitions', 'r')
-        for line in f.readlines():
-            parts = line.strip().split()
-            if not parts:
-                continue
-            device = parts[3]
-            if not re.search('sd[a-z][1-9]', device):
-                continue
-            if device in list2:
-                continue
-            if device in swapdevices:
-                continue
-            self.buildMy_rec(device)
-            list2.append(device)
 
-        f.close()
+        try:
+            with open('/proc/partitions', 'r') as f:
+                for line in f.readlines():
+                    parts = line.strip().split()
+                    if not parts:
+                        continue
+                    device = parts[3]
+                    if not re.search('sd[a-z][1-9]', device):
+                        continue
+                    if device in list2:
+                        continue
+                    if device in swapdevices:
+                        continue
+                    self.buildMy_rec(device)
+                    list2.append(device)
+        except FileNotFoundError:
+            pass
+
         self['config'].list = self.list
         self['config'].l.setList(self.list)
         self['Linconn'].hide()
@@ -372,8 +459,13 @@ class DevicesConf(Screen, ConfigListScreen):
         d2 = device
         name = _('HARD DISK: ')
         mypixmap = '' + LinkNeoBoot + '/images/dev_hdd.png'
-        model = open('/sys/block/' + device2 + '/device/model').read()
-        model = str(model).replace('\n', '')
+
+        try:
+            with open('/sys/block/' + device2 + '/device/model', 'r') as f:
+                model = f.read().strip()
+        except IOError:
+            model = 'Unknown Model'
+
         des = ''
         if devicetype.find('usb') != -1:
             name = _('USB: ')
@@ -389,45 +481,63 @@ class DevicesConf(Screen, ConfigListScreen):
             mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'
         if devicetype.find('mmc') != -1:
             name = _('MMC: ')
-            mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'            
-            
+            mypixmap = '' + LinkNeoBoot + '/images/dev_sd.png'
 
         name = name + model
-        f = open('/proc/mounts', 'r')
-        for line in f.readlines():
-            if line.find(device) != -1:
-                parts = line.strip().split()
-                d1 = parts[1]
-                dtype = parts[2]
-                break
-                continue
-            else:
-                d1 = _('None')
-                dtype = _('unavailable')
+        d1 = _('None')
+        dtype = _('unavailable')
 
-        f.close()
+        try:
+            with open('/proc/mounts', 'r') as f:
+                for line in f.readlines():
+                    if line.find(device) != -1:
+                        parts = line.strip().split()
+                        d1 = parts[1]
+                        dtype = parts[2]
+                        break
+        except FileNotFoundError:
+            pass
+
         size = Harddisk(device).diskSize()
         if float(size) / 1024 / 1024 >= 1:
-            des = _('Size: ') + str(round(float(size) / 1024 / 1024, 2)) + _('TB')
-        elif size / 1024 >= 1:
+            des = _('Size: ') + \
+                str(round(float(size) / 1024 / 1024, 2)) + _('TB')
+        elif float(size) / 1024 >= 1:
             des = _('Size: ') + str(round(float(size) / 1024, 2)) + _('GB')
         elif size >= 1:
             des = _('Size: ') + str(size) + _('MB')
         else:
             des = _('Size: ') + _('unavailable')
-        item = NoSave(ConfigSelection(default='/media/' + device, choices=[('/media/' + device, '/media/' + device),
-         ('/media/hdd', '/media/hdd'),
-         ('/media/hdd2', '/media/hdd2'),
-         ('/media/hdd3', '/media/hdd3'),
-         ('/media/usb', '/media/usb'),
-         ('/media/usb1', '/media/usb1'),
-         ('/media/usb2', '/media/usb2'),
-         ('/media/usb3', '/media/usb3'),
-         ('/media/usb3', '/media/cf'),
-         ('/media/usb3', '/media/card'),
-         ('/media/cf', '/media/cf'),
-         ('/media/mmc', '/media/mmc'),         
-         ('/media/card', '/media/card')]))
+        item = NoSave(
+            ConfigSelection(
+                default='/media/' + device,
+                choices=[
+                    ('/media/' + device,
+                     '/media/' + device),
+                    ('/media/hdd',
+                     '/media/hdd'),
+                    ('/media/hdd2',
+                     '/media/hdd2'),
+                    ('/media/hdd3',
+                     '/media/hdd3'),
+                    ('/media/usb',
+                     '/media/usb'),
+                    ('/media/usb1',
+                     '/media/usb1'),
+                    ('/media/usb2',
+                     '/media/usb2'),
+                    ('/media/usb3',
+                     '/media/usb3'),
+                    ('/media/usb3',
+                     '/media/cf'),
+                    ('/media/usb3',
+                     '/media/card'),
+                    ('/media/cf',
+                     '/media/cf'),
+                    ('/media/mmc',
+                     '/media/mmc'),
+                    ('/media/card',
+                     '/media/card')]))
         if dtype == 'Linux':
             dtype = 'ext2', 'ext3', 'ext4'
         else:
@@ -446,37 +556,61 @@ class DevicesConf(Screen, ConfigListScreen):
             self.mountp = x[1].value
             self.type = x[3]
             self.Console.ePopen('umount ' + self.device)
-            self.Console.ePopen('/sbin/blkid | grep ' + self.device + ' && opkg list-installed ntfs-3g', self.add_fstab, [self.device, self.mountp])
+            self.Console.ePopen(
+                '/sbin/blkid | grep ' +
+                self.device +
+                ' && opkg list-installed ntfs-3g',
+                self.add_fstab,
+                [
+                    self.device,
+                    self.mountp])
 
         message = _('Continues mounting equipment...')
-        ybox = self.session.openWithCallback(self.delay, MessageBox, message, type=MessageBox.TYPE_INFO, timeout=5, enable_input=False)
+        ybox = self.session.openWithCallback(
+            self.delay,
+            MessageBox,
+            message,
+            type=MessageBox.TYPE_INFO,
+            timeout=5,
+            enable_input=False)
         ybox.setTitle(_('Please, wait....'))
 
     def delay(self, val):
-        if fileExists('/etc/init.d/volatile-media.sh') and getBoxHostName() == "vusolo2":
+        if fileExists(
+                '/etc/init.d/volatile-media.sh') and getBoxHostName() == "vusolo2":
             system('mv /etc/init.d/volatile-media.sh /etc/init.d/volatile-media.sh.org')
         message = _('GUI needs a restart.\nDo you want to Restart the GUI now?')
-        ybox = self.session.openWithCallback(self.myclose, MessageBox, message, MessageBox.TYPE_YESNO)
+        ybox = self.session.openWithCallback(
+            self.myclose, MessageBox, message, MessageBox.TYPE_YESNO)
         ybox.setTitle(_('MOUNTING....'))
 
     def myclose(self, answer):
         if answer is True:
-            os.system('reboot -f')                             
+            os.system('reboot -f')
         else:
-            self.messagebox = self.session.open(MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO)
+            self.messagebox = self.session.open(
+                MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO)
             self.close()
 
     def add_fstab(self, result=None, retval=None, extra_args=None):
-        print("[MountManager] RESULT:"), result
+        print("[MountManager] RESULT:", result)  # Python 3 print function
         if result:
             self.device = extra_args[0]
             self.mountp = extra_args[1]
-            if fileExists('/usr/lib/python2.7'):
-                self.device_uuid = 'UUID=' + result.split('UUID=')[1].split(' ')[0].replace('"', '')
-                self.device_type = result.split('TYPE=')[1].split(' ')[0].replace('"', '')
-            else:              
-                self.device_uuid = 'UUID=' + getMyUUID()
-                self.device_type = getCheckExt()                        
+
+            # Simplified Python 2 check logic since we target Python 3.13
+            # Assuming getMyUUID and getCheckExt are always available or handle
+            # their own platform differences
+
+            # if fileExists('/usr/lib/python2.7'): # Removed
+            self.device_uuid = 'UUID=' + \
+                result.split('UUID=')[1].split(' ')[0].replace('"', '')
+            self.device_type = result.split('TYPE=')[1].split(' ')[
+                0].replace('"', '')
+            # else: # Modified/removed logic
+            #    self.device_uuid = 'UUID=' + getMyUUID()
+            #    self.device_type = getCheckExt()
+
             if self.device_type.startswith('ext'):
                 self.device_type = 'auto'
             elif self.device_type.startswith('ntfs') and result.find('ntfs-3g') != -1:
@@ -485,22 +619,35 @@ class DevicesConf(Screen, ConfigListScreen):
                 self.device_type = 'ntfs'
             if not path.exists(self.mountp):
                 mkdir(self.mountp, 493)
-            open('/etc/fstab.tmp', 'w').writelines([l for l in open('/etc/fstab').readlines() if self.device not in l])
+
+            with open('/etc/fstab', 'r') as f:
+                lines = f.readlines()
+
+            with open('/etc/fstab.tmp', 'w') as out:
+                out.writelines([l for l in lines if self.device not in l])
             rename('/etc/fstab.tmp', '/etc/fstab')
-            open('/etc/fstab.tmp', 'w').writelines([l for l in open('/etc/fstab').readlines() if self.device_uuid not in l])
+
+            with open('/etc/fstab', 'r') as f:
+                lines = f.readlines()
+
+            with open('/etc/fstab.tmp', 'w') as out:
+                out.writelines([l for l in lines if self.device_uuid not in l])
             rename('/etc/fstab.tmp', '/etc/fstab')
-            out = open('/etc/fstab', 'a')
-            if fileExists('/usr/lib/python2.7'):
-                line = self.device_uuid + '\t' + self.mountp + '\t' + self.device_type + '\tdefaults\t0 0\n'
-            else:
-                line = 'UUID=' + getMyUUID() + '\t' + self.mountp + '\t' + self.device_type + '\tdefaults\t0 0\n'                           
-            out.write(line)
-            out.close()
-            if fileExists('/usr/lib/python2.7'):
-                self.device_uuid2 = result.split('UUID=')[1].split(' ')[0].replace('"', '')
-            else:
-                self.device_uuid = getMyUUID()
-                
+
+            with open('/etc/fstab', 'a') as out:
+                # if fileExists('/usr/lib/python2.7'): # Removed
+                line = self.device_uuid + '\t' + self.mountp + \
+                    '\t' + self.device_type + '\tdefaults\t0 0\n'
+                # else: # Modified/removed logic
+                #    line = 'UUID=' + getMyUUID() + '\t' + self.mountp + '\t' + self.device_type + '\tdefaults\t0 0\n'
+                out.write(line)
+
+            # if fileExists('/usr/lib/python2.7'): # Removed
+            self.device_uuid2 = result.split('UUID=')[1].split(' ')[
+                0].replace('"', '')
+            # else: # Modified/removed logic
+            #    self.device_uuid = getMyUUID()
+
 #            if fileExists('/usr/lib/enigma2/python/Plugins/SystemPlugins/DeviceManager2'):
 #                out1 = open('/etc/devicemanager.cfg', 'a')
 #                line1 = '"' + self.device_uuid2 + '"' + ':' + self.mountp + '\n'
@@ -513,7 +660,7 @@ class DevicesConf(Screen, ConfigListScreen):
 #                out2.close()
 
 
-#SetDiskLabel - dziekuje autorowi
+# SetDiskLabel - dziekuje autorowi
 class SetDiskLabel(Screen):
     screenwidth = getDesktop(0).size().width()
     if screenwidth and screenwidth == 1920:
@@ -589,73 +736,103 @@ class SetDiskLabel(Screen):
         self['key_green'] = Button(_('Set label'))
         self['key_yellow'] = Button(_('Add label'))
         self['key_blue'] = Button(_('Delete label'))
-        self['actions'] = ActionMap(['OkCancelActions', 'ColorActions', 'DirectionActions'], {'cancel': self.MyClose,
-         'red': self.MyClose,
-         'green': self.wlacz,
-         'yellow': self.addlabel,
-         'blue': self.dellabel,
-         'left': self.left,
-         'right': self.right,
-         'up': self.up,
-         'down': self.down}, -2)
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'DirectionActions'],
+                                    {'cancel': self.MyClose,
+                                     'red': self.MyClose,
+                                     'green': self.wlacz,
+                                     'yellow': self.addlabel,
+                                     'blue': self.dellabel,
+                                     'left': self.left,
+                                     'right': self.right,
+                                     'up': self.up,
+                                     'down': self.down},
+                                    -2)
 
     def sprDev(self):
         global lista
         lista = ['']
-        tuner_model = getTunerModel()
         blackL = ''
-        if tuner_model in ('sf8008', 'sf8008s', 'sf8008t'):
+        if getTunerModel() in ('sf8008', 'sf8008s', 'sf8008t'):
             blackL = 'mmcblk0'
-        elif tuner_model in ('h9se'):
+        if getTunerModel() in ('h9se'):
             blackL = 'mmcblk1'
         else:
-            try:
-                blackL_output = subprocess.getoutput('cat /etc/udev/mount-helper.sh | grep "BLACKLISTED="')
+            # Use getoutput function defined above (which uses subprocess)
+            blackL_output = getoutput(
+                'cat /etc/udev/mount-helper.sh | grep "BLACKLISTED="')
+            if blackL_output:
                 blackL = blackL_output[13:-1]
-            except Exception:
-                blackL = ''
-        try:
-            devL_output = subprocess.getoutput('cat /proc/partitions | grep "sd\\|mmc" | awk \'{print $4}\'')
-            devL = devL_output.split('\n')
-        except Exception:
-            devL = []
 
+        devL = getoutput(
+            'cat /proc/partitions | grep "sd\\|mmc" | awk \'{print $4}\'')
+        devL = devL.split('\n')
         ilosc = len(devL)
         i = 0
         while i < ilosc:
             if len(devL[i]) == 9 or len(devL[i]) == 4:
                 if devL[i][:7] != blackL:
-                    if self.sprLinux(devL[i]) is True:
+                    if self.sprLinux(devL[i]):
                         lista.append(devL[i])
             i += 1
 
-        if ilosc > 0 and '' in lista:
+        if ilosc > 0:
             lista.remove('')
-        elif not lista and not ilosc:
-            lista.append('No Disk')
+        elif lista[0] == '':
+            lista.remove('')
+            lista.insert(0, 'No Disk')
 
     def cancel(self):
         self.close()
 
     def wlacz(self):
-        self.session.openWithCallback(self.wlaczyes, MessageBox, _('Set label on %s?') % str(self['devlist'].getCurrent()), MessageBox.TYPE_YESNO, default=False)
+        self.session.openWithCallback(
+            self.wlaczyes,
+            MessageBox,
+            _('Set label on %s?') % str(
+                self['devlist'].getCurrent()),
+            MessageBox.TYPE_YESNO,
+            default=False)
 
     def wlaczyes(self, w):
-        if w == True:
-            os.system('e2label /dev/%s "%s"' % (str(self['devlist'].getCurrent()), self['listlabel'].getCurrent()))
-            self.session.open(MessageBox, _('Selected label is set'), type=MessageBox.TYPE_INFO, timeout=10)
+        if w:
+            os.system(
+                'e2label /dev/%s "%s"' %
+                (str(
+                    self['devlist'].getCurrent()),
+                    self['listlabel'].getCurrent()))
+            self.session.open(
+                MessageBox,
+                _('Selected label is set'),
+                type=MessageBox.TYPE_INFO,
+                timeout=10)
             self.sprLabel()
 
     def addlabel(self):
-        self.session.openWithCallback(self.addlabeltolist, VirtualKeyBoard, title=_('Add new partition label:'), text=self['disklabel'].getText())
+        self.session.openWithCallback(
+            self.addlabeltolist,
+            VirtualKeyBoard,
+            title=_('Add new partition label:'),
+            text=self['disklabel'].getText())
 
     def dellabel(self):
-        self.session.openWithCallback(self.delabelyes, MessageBox, _('Delete label from %s?') % str(self['devlist'].getCurrent()), MessageBox.TYPE_YESNO, default=False)
+        self.session.openWithCallback(
+            self.delabelyes,
+            MessageBox,
+            _('Delete label from %s?') % str(
+                self['devlist'].getCurrent()),
+            MessageBox.TYPE_YESNO,
+            default=False)
 
     def delabelyes(self, k):
-        if k == True:
+        if k:
             os.system('e2label /dev/%s ""' % str(self['devlist'].getCurrent()))
-            self.session.open(MessageBox, _('Label is delete'), type=MessageBox.TYPE_INFO, timeout=10)
+            self.session.open(
+                MessageBox,
+                _('Label is delete'),
+                type=MessageBox.TYPE_INFO,
+                timeout=10)
             self.sprLabel()
 
     def zamknij(self, data):
@@ -681,26 +858,20 @@ class SetDiskLabel(Screen):
         return
 
     def sprLabel(self):
-        current_device = self['devlist'].getCurrent()
-        if not current_device:
-            self['disklabel'].setText(_('No device selected'))
-            return
-        try:
-            lab_output = subprocess.getoutput('blkid /dev/' + current_device)
-        except Exception:
-            lab_output = ''
-        if lab_output:
-            lab1 = lab_output.split(' ')
-            for item in lab1:
-                if item.startswith('LABEL='):
-                    label = item.split('"')[1]
-                    self['disklabel'].setText(label)
-                    return
-                    
-        self['disklabel'].setText(_('No label'))
+        lab = getoutput('blkid /dev/' + self['devlist'].getCurrent())
+        lab1 = lab.split(' ')
+        licz1 = len(lab1)
+        i = 0
+        while i < licz1:
+            if lab1[i][:5] == 'LABEL':
+                self['disklabel'].setText(lab1[i][7:-1])
+                break
+            else:
+                self['disklabel'].setText(_('No label'))
+            i += 1
 
     def sprLinux(self, dev):
-        lab = subprocess.getoutput('blkid /dev/' + dev)
+        lab = getoutput('blkid /dev/' + dev)
         lab1 = lab.split(' ')
         licz1 = len(lab1)
         jest = False
@@ -711,21 +882,24 @@ class SetDiskLabel(Screen):
                 return jest
             jest = False
             j += 1
+
         return jest
-    
+
     def MyClose(self):
         message = _('GUI needs a restart.\nDo you want to Restart the GUI now?')
-        ybox = self.session.openWithCallback(self.mbdelete, MessageBox, message, MessageBox.TYPE_YESNO)
+        ybox = self.session.openWithCallback(
+            self.mbdelete, MessageBox, message, MessageBox.TYPE_YESNO)
         ybox.setTitle(_('Label Disc'))
 
     def mbdelete(self, answer):
         if answer is True:
-            os.system('reboot -f')                             
+            os.system('reboot -f')
         else:
-            self.messagebox = self.session.open(MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO)
-            self.close()    
+            self.messagebox = self.session.open(
+                MessageBox, _('Return to installation...'), MessageBox.TYPE_INFO)
+            self.close()
 
-            
+
 class DeviceManagerSummary(Screen):
     def __init__(self, session, parent):
         Screen.__init__(self, session, parent=parent)

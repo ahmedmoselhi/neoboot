@@ -239,7 +239,8 @@ MyUpgradeHD = """
                 </screen>"""
 
 
-# ____ Skin NeoBootInstallationFULLHD - NeoBootInstallationFULLHD ___mod. gutosie ___
+# ____ Skin NeoBootInstallationFULLHD - NeoBootInstallationFULLHD ___mod.
+# gutosie ___
 NeoBootInstallationFULLHD = """
 <screen name="NeoBootInstallationFULLHD" position="410,138" size="1200,850" title="NeoBoot">
         <ePixmap position="643,282" zPosition="-2" size="531,331" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/images/matrix.png" />
@@ -264,7 +265,8 @@ NeoBootInstallationFULLHD = """
         <widget name="key_blue" position="856,761" zPosition="1" size="326,52" font="dugme; 28" halign="center" valign="center" backgroundColor="blue" transparent="1" foregroundColor="blue" />
         </screen>"""
 
-# ____ Skin NeoBootInstallationUltraHD - NeoBootInstallationUltraHD ___mod. gutosie ___
+# ____ Skin NeoBootInstallationUltraHD - NeoBootInstallationUltraHD
+# ___mod. gutosie ___
 NeoBootInstallationUltraHD = """
 <screen name="NeoBootInstallationUltraHD" position="0,0" size="3840,2160" flags="wfNoBorder" backgroundColor="#ff111111">
         <widget source="Title" render="Label" position="174,108" size="1575,150" font="baslk;102" valign="bottom" foregroundColor="#00FFFFFF" backgroundColor="#1A0F0F0F" noWrap="1" transparent="1" />
