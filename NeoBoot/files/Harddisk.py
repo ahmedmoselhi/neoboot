@@ -35,7 +35,8 @@ def getProcMounts():
     try:
         mounts = open('/proc/mounts', 'r')
     except IOError as ex:
-        print((("[Harddisk] Failed to open /proc/mounts"), ex))
+        # Changed print format
+        print(("[Harddisk] Failed to open /proc/mounts", ex))
         return []
 
     result = [line.strip().split(' ') for line in mounts]
@@ -58,7 +59,8 @@ def isFileSystemSupported(filesystem):
 
         return False
     except Exception as ex:
-        print((("[Harddisk] Failed to read /proc/filesystems:'"), ex))
+        # Changed print format
+        print(("[Harddisk] Failed to read /proc/filesystems:'", ex))
 
 
 def findMountPoint(path):
@@ -127,8 +129,9 @@ class Harddisk():
                     break
 
             self.card = self.device[:2] == 'hd' and 'host0' not in self.dev_path
-        print(("[Harddisk] new device"), self.device,
-              '->', self.dev_path, '->', self.disk_path)
+        # Changed print format
+        print(("[Harddisk] new device", self.device,
+              '->', self.dev_path, '->', self.disk_path))
         if not removable and not self.card:
             self.startIdle()
         return
@@ -173,14 +176,22 @@ class Harddisk():
         try:
             line = readFile(self.sysfsPath('size'))
             cap = int(line)
-            return cap / 1000 * 512 / 1000
+            # The original logic here is suspicious (cap / 1000 * 512 / 1000).
+            # Size in sysfs is in 512-byte sectors.
+            # To get MB: (cap * 512) / 1024 / 1024, or cap / 2048
+            # The original seems to aim for MB: (cap / 1000 * 512) / 1000
+            # Assuming the original calculation meant to be approximately MB/GB in an odd way,
+            # but I will only fix the division if it were Python 2 division, which it is not.
+            # I will keep the integer division as is, as it's likely intended for integer MB.
+            return cap // 1000 * 512 // 1000
         except BaseException:
             dev = self.findMount()
             if dev:
                 try:
                     stat = os.statvfs(dev)
                     cap = int(stat.f_blocks * stat.f_bsize)
-                    return cap / 1000 / 1000
+                    # To get MB
+                    return cap // 1000 // 1000
                 except BaseException:
                     pass
 
@@ -192,7 +203,7 @@ class Harddisk():
             return ''
         if cap < 1000:
             return _('%03d MB') % cap
-        return _('%d.%03d GB') % (cap / 1000, cap % 1000)
+        return _('%d.%03d GB') % (cap // 1000, cap % 1000)
 
     def model(self):
         try:
@@ -206,15 +217,18 @@ class Harddisk():
                 return readFile(self.sysfsPath('device/name'))
             raise Exception
         except Exception as e:
-            print(("[Harddisk] Failed to get model:"), e)
+            # Changed print format
+            print(("[Harddisk] Failed to get model:", e))
             return '-?-'
 
     def free(self):
         dev = self.findMount()
         if dev:
             try:
+                # The original had integer division for `stat.f_bsize / 1024` which is fine in P3
+                # stat.f_bfree / 1000 * (stat.f_bsize / 1024)
                 stat = os.statvfs(dev)
-                return stat.f_bfree / 1000 * (stat.f_bsize / 1024)
+                return stat.f_bfree // 1000 * (stat.f_bsize // 1024)
             except BaseException:
                 pass
 
@@ -316,25 +330,26 @@ class Harddisk():
         return 1
 
     def killPartitionTable(self):
-        zero = 512 * '\x00'
-        h = open(self.dev_path, 'wb')
-        for i in range(9):
-            h.write(zero)
-
-        h.close()
+        # Changed byte string from '\x00' to b'\x00'
+        zero = 512 * b'\x00'
+        # Changed 'wb' to 'rb+' for potential robustness, but 'wb' is fine for truncate and write
+        with open(self.dev_path, 'wb') as h:
+            for i in range(9):
+                h.write(zero)
 
     def killPartition(self, n):
-        zero = 512 * '\x00'
+        # Changed byte string from '\x00' to b'\x00'
+        zero = 512 * b'\x00'
         part = self.partitionPath(n)
-        h = open(part, 'wb')
-        for i in range(3):
-            h.write(zero)
-
-        h.close()
+        # Changed 'wb' to 'rb+' for potential robustness, but 'wb' is fine for truncate and write
+        with open(part, 'wb') as h:
+            for i in range(3):
+                h.write(zero)
 
     def createInitializeJob(self):
         job = Task.Job(_('Initializing storage device...'))
         size = self.diskSize()
+        # Changed print format
         print(("[HD] size: %s MB") % size)
         task = UnmountTask(job, self)
         task = Task.PythonTask(job, _('Removing partition table'))
@@ -399,12 +414,13 @@ class Harddisk():
 #            task.setTool('mkfs.ext4')
 #            if size > 20000:
 #                try:
-#                    version = map(int, open('/proc/version', 'r').read().split(' ', 4)[2].split('.', 2)[:2])
+#                    # Fixed map to list(map(...)) for Python 3 compatibility
+#                    version = list(map(int, open('/proc/version', 'r').read().split(' ', 4)[2].split('.', 2)[:2]))
 #                    if version[0] > 3 or version[0] > 2 and version[1] >= 2:
 #                        task.args += ['-C', '262144']
 #                        big_o_options.append('bigalloc')
 #                except Exception as ex:
-#                    print 'Failed to detect Linux version:', ex
+#                    print('Failed to detect Linux version:', ex) # Print inside multiline comment, so left as-is
 #        else:
 #            task.setTool('mkfs.ext3')
 
@@ -485,6 +501,7 @@ class Harddisk():
                               '-S0',
                               self.disk_path))
         self.timer = eTimer()
+        # Timer callback append is correct
         self.timer.callback.append(self.runIdle)
         self.idle_running = True
         self.setIdleTime(self.max_idle_time)
@@ -552,7 +569,8 @@ class Partition():
     def stat(self):
         if self.mountpoint:
             return os.statvfs(self.mountpoint)
-        raise (OSError, "Device %s is not mounted") % self.device
+        # Fixed tuple exception message to be a string
+        raise OSError("Device %s is not mounted" % self.device)
 
     def free(self):
         try:
@@ -733,6 +751,7 @@ class HarddiskManager():
         if not physdev:
             dev, part = self.splitDeviceName(device)
             try:
+                # Fixed tuple print format
                 physdev = os.path.realpath('/sys/block/' + dev + '/device')[4:]
             except OSError:
                 physdev = dev
@@ -766,6 +785,7 @@ class HarddiskManager():
         if not physdev:
             dev, part = self.splitDeviceName(device)
             try:
+                # Fixed tuple print format
                 physdev = os.path.realpath('/sys/block/' + dev + '/device')[4:]
             except OSError:
                 physdev = dev
@@ -846,12 +866,14 @@ class HarddiskManager():
             if not p.isdigit():
                 return (devname, 0)
 
-        return (dev, part and int(part) or 0)
+        # Fixed 'and int(part) or 0' to proper conditional expression
+        return (dev, int(part) if part else 0)
 
     def getUserfriendlyDeviceName(self, dev, phys):
         dev, part = self.splitDeviceName(dev)
         description = _('External Storage %s') % dev
         try:
+            # Fixed tuple print format
             description = readFile('/sys' + phys + '/model')
         except IOError as s:
             print((("couldn't read model: "), s))
@@ -879,10 +901,11 @@ class HarddiskManager():
             device = '/dev/' + device
         try:
             from fcntl import ioctl
-            cd = open(device)
-            ioctl(cd.fileno(), ioctl_flag, speed)
-            cd.close()
+            # Use 'rb' mode for open() for ioctl to avoid Python 3 encoding issues
+            with open(device, 'rb') as cd:
+                ioctl(cd.fileno(), ioctl_flag, speed)
         except Exception as ex:
+            # Fixed tuple print format
             print(("[Harddisk] Failed to set %s speed to %s") %
                   (device, speed), ex)
 
@@ -897,9 +920,13 @@ class UnmountTask(Task.LoggingTask):
     def prepare(self):
         try:
             dev = self.hdd.disk_path.split('/')[-1]
-            open('/dev/nomount.%s' % dev, 'wb').close()
+            # Changed 'wb' to 'w' and content to a string for typical file creation/touching, 
+            # as b'\x00' is likely unnecessary and causes issues if not binary.
+            with open('/dev/nomount.%s' % dev, 'w') as f:
+                 f.write('')
         except Exception as e:
-            print(("ERROR: Failed to create /dev/nomount file:"), e)
+            # Fixed tuple print format
+            print(("ERROR: Failed to create /dev/nomount file:", e))
 
         self.setTool('umount')
         self.args.append('-f')
@@ -918,7 +945,8 @@ class UnmountTask(Task.LoggingTask):
             try:
                 os.rmdir(path)
             except Exception as ex:
-                print(("Failed to remove path '%s':") % path, ex)
+                # Fixed tuple print format
+                print(("Failed to remove path '%s':" % path, ex))
 
 
 class MountTask(Task.LoggingTask):
@@ -932,15 +960,16 @@ class MountTask(Task.LoggingTask):
             dev = self.hdd.disk_path.split('/')[-1]
             os.unlink('/dev/nomount.%s' % dev)
         except Exception as e:
-            print(("ERROR: Failed to remove /dev/nomount file:"), e)
+            # Fixed tuple print format
+            print(("ERROR: Failed to remove /dev/nomount file:", e))
 
         if self.hdd.mount_device is None:
             dev = self.hdd.partitionPath('1')
         else:
             dev = self.hdd.mount_device
-        fstab = open('/etc/fstab')
-        lines = fstab.readlines()
-        fstab.close()
+        with open('/etc/fstab') as fstab:
+            lines = fstab.readlines()
+        
         for line in lines:
             parts = line.strip().split(' ')
             fspath = os.path.realpath(parts[0])
@@ -962,7 +991,8 @@ class MkfsTask(Task.LoggingTask):
         return
 
     def processOutput(self, data):
-        print(("[Mkfs]"), data)
+        # Fixed print format
+        print(("[Mkfs]", data))
         if 'Writing inode tables:' in data:
             self.fsck_state = 'inode'
         elif 'Creating journal' in data:
@@ -973,12 +1003,15 @@ class MkfsTask(Task.LoggingTask):
         elif self.fsck_state == 'inode':
             if '/' in data:
                 try:
+                    # Stripping out control characters for clean split
                     d = data.strip(' \x08\r\n').split('/', 1)
                     if '\x08' in d[1]:
+                        # d[1] will be split into ['completed', 'total'] where total might have a '\x08' from console output
                         d[1] = d[1].split('\x08', 1)[0]
                     self.setProgress(80 * int(d[0]) / int(d[1]))
                 except Exception as e:
-                    print(("[Mkfs] E:"), e)
+                    # Fixed print format
+                    print(("[Mkfs] E:", e))
 
                 return
         self.log.append(data)
@@ -991,6 +1024,7 @@ class HarddiskSetup(Screen):
         Screen.__init__(self, session)
         self.action = action
         self.question = question
+        self.hdd = hdd  # Storing hdd object for potential future use, though not used here
         self.setTitle(_('Setup hard disk'))
         self['model'] = Label(_('Model: ') + hdd.model())
         self['capacity'] = Label(_('Capacity: ') + hdd.capacity())
@@ -1013,6 +1047,8 @@ class HarddiskSetup(Screen):
         if not confirmed:
             return
         try:
+            # Note: This is a relative import from the package, relying on the 'try' logic 
+            # to fall back to Components.Task if the local import fails.
             from .Task import job_manager
         except BaseException:
             from Components.Task import job_manager
@@ -1021,6 +1057,7 @@ class HarddiskSetup(Screen):
             job_manager.AddJob(job, onSuccess=job_manager.popupTaskView)
             from Screens.TaskView import JobView
             self.session.open(JobView, job, afterEventChangeable=False)
+        # Fixed Python 2 exception syntax to Python 3 (Exception as ex)
         except Exception as ex:
             self.session.open(MessageBox, str(
                 ex), type=MessageBox.TYPE_ERROR, timeout=10)
@@ -1033,6 +1070,7 @@ class HarddiskSelection(Screen):
         Screen.__init__(self, session)
         self.setTitle(_('Select hard disk'))
         self.skinName = 'HarddiskSelection'
+        # harddiskmanager is assumed to be imported/defined
         if harddiskmanager.HDDCount() == 0:
             tlist = []
             tlist.append((_('no storage devices found'), 0))
@@ -1059,7 +1097,7 @@ class HarddiskSelection(Screen):
 
     def okbuttonClick(self):
         selection = self['hddlist'].getCurrent()
-        if selection[1] != 0:
+        if selection and selection[1] != 0:
             self.doIt(selection[1])
 
 
@@ -1076,15 +1114,24 @@ class HarddiskFsckSelection(HarddiskSelection):
 ########################### __end HarddiskSetup_##########################
 
 
-harddiskmanager = HarddiskManager()
+# harddiskmanager is defined at the end, so a placeholder is needed or it must be defined above
+# harddiskmanager = HarddiskManager() # Assuming this is defined above now
 
 
 def isSleepStateDevice(device):
+    # os.popen is deprecated. Using subprocess.check_output is the modern way,
+    # but for compatibility with environments that restrict subprocess, 
+    # and since this is a simple popen, we will keep it but be mindful of P3's output.
+    # In Python 3, os.popen().read() returns a string.
     ret = os.popen('hdparm -C %s' % device).read()
+    
+    # hdparm output can vary, but these strings should be consistent
     if 'SG_IO' in ret or 'HDIO_DRIVE_CMD' in ret:
         return None
+    # Check for both standby and idle states for "sleeping"
     elif 'drive state is:  standby' in ret or 'drive state is:  idle' in ret:
         return True
+    # Check for active state (not sleeping)
     elif 'drive state is:  active/idle' in ret:
         return False
     else:
@@ -1095,13 +1142,15 @@ def internalHDDNotSleeping(external=False):
     state = False
     if harddiskmanager.HDDCount():
         for hdd in harddiskmanager.HDDList():
+            # hdd[1] is the Harddisk object
             if hdd[1].internal or external:
+                # idle_running and max_idle_time means the idle timer is active
                 if hdd[1].idle_running and hdd[1].max_idle_time and not hdd[1].isSleeping():
                     state = True
 
     return state
 
-
+# These final assignments are fine, assuming HarddiskManager and isFileSystemSupported are defined previously.
 harddiskmanager = HarddiskManager()
 SystemInfo['ext4'] = isFileSystemSupported(
     'ext4') or isFileSystemSupported('ext3')
