@@ -32,7 +32,8 @@ from os import system, listdir, mkdir, chdir, getcwd, rename as os_rename, remov
 from os.path import dirname, isdir, isdir as os_isdir
 import os
 import time
-if not fileExists('/etc/vtiversion.info') and not fileExists('/etc/bhversion') and fileExists('/usr/lib/python2.7'):
+if not fileExists('/etc/vtiversion.info') and not fileExists(
+        '/etc/bhversion') and fileExists('/usr/lib/python2.7'):
     from Plugins.Extensions.NeoBoot.files.neoconsole import Console
 else:
     from Screens.Console import Console
@@ -160,7 +161,7 @@ class InstallImage(Screen, ConfigListScreen):
         self.Kodi = ConfigYesNo(default=False)
         self.BlackHole = ConfigYesNo(default=False)
         for line in open("/etc/hostname"):
-            if getCPUtype() == 'MIPS' and not "dm500hd" in line and not "dm800se" in line and not "dm800" in line and not "dm8000" in line:
+            if getCPUtype() == 'MIPS' and "dm500hd" not in line and "dm800se" not in line and "dm800" not in line and "dm8000" not in line:
                 self.Nandsim = ConfigYesNo(default=True)
             else:
                 self.Nandsim = ConfigYesNo(default=False)
@@ -170,7 +171,7 @@ class InstallImage(Screen, ConfigListScreen):
             if self.curselimage != self.source.value:
                 self.target.value = self.source.value[:-13]
                 self.curselimage = self.source.value
-        except:
+        except BaseException:
             pass
 
         self.createSetup()
@@ -196,24 +197,32 @@ class InstallImage(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(
             _('Source Image file'), self.source))
         self.list.append(getConfigListEntry(_('Image Name'), self.target))
-        self.list.append(getConfigListEntry(
-            _('Copy files from Flash to the installed image ?'), self.CopyFiles))
-        self.list.append(getConfigListEntry(
-            _('Copy the kernel of the installed system (recommended ?'), self.CopyKernel))
+        self.list.append(
+            getConfigListEntry(
+                _('Copy files from Flash to the installed image ?'),
+                self.CopyFiles))
+        self.list.append(
+            getConfigListEntry(
+                _('Copy the kernel of the installed system (recommended ?'),
+                self.CopyKernel))
         self.list.append(getConfigListEntry(
             _('Copy the channel list ?'), self.TvList))
         self.list.append(getConfigListEntry(
             _('Copy network settings LAN-WLAN ?'), self.LanWlan))
-        self.list.append(getConfigListEntry(
-            _('Copy the drivers ? (Recommended only other image.)'), self.Sterowniki))
+        self.list.append(
+            getConfigListEntry(
+                _('Copy the drivers ? (Recommended only other image.)'),
+                self.Sterowniki))
         self.list.append(getConfigListEntry(
             _('Copy mounting disks ? (Recommended)'), self.Montowanie))
         self.list.append(getConfigListEntry(
             _('Copy Settings to the new Image'), self.InstallSettings))
         self.list.append(getConfigListEntry(
             _('Delete Image zip after Install ?'), self.ZipDelete))
-        self.list.append(getConfigListEntry(
-            _('Repair FTP ? (Recommended only other image if it does not work.)'), self.RepairFTP))
+        self.list.append(
+            getConfigListEntry(
+                _('Repair FTP ? (Recommended only other image if it does not work.)'),
+                self.RepairFTP))
         self.list.append(getConfigListEntry(
             _('Copy config SoftCam ?'), self.SoftCam))
         self.list.append(getConfigListEntry(
@@ -222,8 +231,10 @@ class InstallImage(Screen, ConfigListScreen):
             _('Copy picon flash to image install ?'), self.PiconR))
         self.list.append(getConfigListEntry(
             _('Transfer kodi settings ?'), self.Kodi))
-        self.list.append(getConfigListEntry(
-            _('Path BlackHole ? (Not recommended for VuPlus)'), self.BlackHole))
+        self.list.append(
+            getConfigListEntry(
+                _('Path BlackHole ? (Not recommended for VuPlus)'),
+                self.BlackHole))
         if getCPUtype() == 'MIPS':
             self.list.append(getConfigListEntry(
                 _('Use Nandsim to install image ?'), self.Nandsim))
@@ -242,12 +253,16 @@ class InstallImage(Screen, ConfigListScreen):
         sel = self['config'].getCurrent()
         if sel:
             if sel == self.target:
-                if self['config'].getCurrent()[1].help_window.instance is not None:
+                if self['config'].getCurrent(
+                )[1].help_window.instance is not None:
                     self['config'].getCurrent()[1].help_window.hide()
             self.vkvar = sel[0]
             if self.vkvar == _('Image Name'):
-                self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[
-                                              0], text=self['config'].getCurrent()[1].value)
+                self.session.openWithCallback(
+                    self.VirtualKeyBoardCallback,
+                    VirtualKeyBoard,
+                    title=self['config'].getCurrent()[0],
+                    text=self['config'].getCurrent()[1].value)
         return
 
     def VirtualKeyBoardCallback(self, callback=None):
@@ -291,16 +306,15 @@ class InstallImage(Screen, ConfigListScreen):
             cmd1 = 'python ' + pluginpath + '/ex_init.py'
             cmd = '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s ' % (cmd1,
                                                                               source,
-                                                                              target.replace(
-                                                                                  ' ', '.'),
+                                                                              target.replace(' ',
+                                                                                             '.'),
                                                                               str(self.CopyFiles.value),
                                                                               str(self.CopyKernel.value),
                                                                               str(self.TvList.value),
                                                                               str(self.LanWlan.value),
                                                                               str(self.Sterowniki.value),
                                                                               str(self.Montowanie.value),
-                                                                              str(
-                                                                                  self.InstallSettings.value),
+                                                                              str(self.InstallSettings.value),
                                                                               str(self.ZipDelete.value),
                                                                               str(self.RepairFTP.value),
                                                                               str(self.SoftCam.value),
@@ -311,8 +325,10 @@ class InstallImage(Screen, ConfigListScreen):
                                                                               str(self.Nandsim.value))
             print("[MULTI-BOOT]: "), cmd
             from Plugins.Extensions.NeoBoot.plugin import PLUGINVERSION
-            self.session.open(Console, _(
-                'NeoBoot v.%s - Install new image') % PLUGINVERSION, [message, cmd])
+            self.session.open(
+                Console, _('NeoBoot v.%s - Install new image') %
+                PLUGINVERSION, [
+                    message, cmd])
 
     def cancel(self):
         self.close()
@@ -334,12 +350,15 @@ class HelpInstall(Screen):
     def __init__(self, session):
         Screen.__init__(self, session)
         self['lab1'] = ScrollLabel('')
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions', 'DirectionActions'], {'back': self.close,
-                                                                                            'ok': self.close,
-                                                                                            'up': self['lab1'].pageUp,
-                                                                                            'left': self['lab1'].pageUp,
-                                                                                            'down': self['lab1'].pageDown,
-                                                                                            'right': self['lab1'].pageDown})
+        self['actions'] = ActionMap(['WizardActions',
+                                     'ColorActions',
+                                     'DirectionActions'],
+                                    {'back': self.close,
+                                     'ok': self.close,
+                                     'up': self['lab1'].pageUp,
+                                     'left': self['lab1'].pageUp,
+                                     'down': self['lab1'].pageDown,
+                                     'right': self['lab1'].pageDown})
         self['lab1'].hide()
         self.updatetext()
 

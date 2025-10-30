@@ -125,7 +125,7 @@ def get_peb_size(path):
     for i in range(0, len(offsets)):
         try:
             diff = offsets[i] - offsets[i - 1]
-        except:
+        except BaseException:
             diff = offsets[i]
 
         if diff not in occurances:

@@ -80,7 +80,7 @@ def set_file_perms(path, inode):
     try:
         os.chmod(path, inode['ino'].mode)
         os.chown(path, inode['ino'].uid, inode['ino'].gid)
-    except:
+    except BaseException:
         raise Exception('Failed File Permissions: %s' % path)
 
 

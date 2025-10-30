@@ -83,7 +83,8 @@ def mountp():
 
 def getSupportedTuners():
     supportedT = ''
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/stbinfo.cfg'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/stbinfo.cfg'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/stbinfo.cfg', 'r') as f:
             lines = f.read()
             f.close()
@@ -103,7 +104,8 @@ def getFreespace(dev):
 
 def getCheckInstal1():
     neocheckinstal = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/install'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/install'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/install', 'r') as f:
             lines1 = f.read()
             f.close()
@@ -114,7 +116,8 @@ def getCheckInstal1():
 
 def getCheckInstal2():
     neocheckinstal = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location', 'r') as f:
             lines2 = f.read()
             f.close()
@@ -125,7 +128,8 @@ def getCheckInstal2():
 
 def getCheckInstal3():
     neocheckinstal = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/files/neo.sh'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/files/neo.sh'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/files/neo.sh', 'r') as f:
             lines3 = f.read()
             f.close()
@@ -152,7 +156,8 @@ def getImageATv():
 
 def getNeoLocation():
     locatinoneo = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location', 'r') as f:
             locatino = f.readline().strip()
             f.close()
@@ -221,7 +226,8 @@ def getCPUtype():
 
 def getFSTAB():
     install = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid', 'r') as f:
             lines = f.read()
             f.close()
@@ -247,7 +253,8 @@ def getFSTAB2():
 
 def getINSTALLNeo():
     neoinstall = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/installNeo'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/installNeo'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/installNeo', 'r') as f:
             lines = f.read()
             f.close()
@@ -327,7 +334,8 @@ def getLocationMultiboot():
 
 def getLabelDisck():
     label = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/bin/reading_blkid', 'r') as f:
             lines = f.read()
             f.close()
@@ -509,7 +517,8 @@ def getImageNeoBoot():
 
 def getBoxVuModel():
     vumodel = 'UNKNOWN'
-    if fileExists("/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/boxtype"):
+    if fileExists(
+            "/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/boxtype"):
         with open('/proc/stb/info/vumodel', 'r') as f:
             vumodel = f.readline().strip()
             f.close()
@@ -521,7 +530,8 @@ def getBoxVuModel():
 
 
 def getVuModel():
-    if fileExists("/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/boxtype"):
+    if fileExists(
+            "/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/boxtype"):
         brand = "Vu+"
         f = open("/proc/stb/info/vumodel", 'r')
         procmodel = f.readline().strip()
@@ -545,7 +555,8 @@ def getBoxHostName():
 
 def getTunerModel():  # < neoboot.py
     BOX_NAME = ''
-    if os.path.isfile('/proc/stb/info/vumodel') and not os.path.isfile("/proc/stb/info/boxtype"):
+    if os.path.isfile(
+            '/proc/stb/info/vumodel') and not os.path.isfile("/proc/stb/info/boxtype"):
         BOX_NAME = open('/proc/stb/info/vumodel').read().strip()
         ImageFolder = 'vuplus/%s' % BOX_NAME
     elif os.path.isfile('proc/stb/info/boxtype'):
@@ -568,8 +579,14 @@ def getImageFolder():
 
 def getKernelVersion():
     try:
-        return open('/proc/version', 'r').read().split(' ', 4)[2].split('-', 2)[0]
-    except:
+        return open(
+            '/proc/version',
+            'r').read().split(
+            ' ',
+            4)[2].split(
+            '-',
+            2)[0]
+    except BaseException:
         return _('unknown')
 
 # czysci pamiec
@@ -586,7 +603,8 @@ def runCMDS(cmdsList):
 def getImageDistroN():
     image = 'Internal storage'
 
-    if fileExists('/.multinfo') and fileExists('%sImageBoot/.imagedistro' % getNeoLocation()):
+    if fileExists(
+            '/.multinfo') and fileExists('%sImageBoot/.imagedistro' % getNeoLocation()):
         with open('%sImageBoot/.imagedistro' % getNeoLocation(), 'r') as f:
             image = f.readline().strip()
             f.close()
@@ -637,7 +655,7 @@ def getKernelVersionString():
         result = open('uname -r', 'r').read().strip('\n').split('-')
         kernel_version = result[0]
         return kernel_version
-    except:
+    except BaseException:
         pass
 
     return 'unknown'
@@ -649,7 +667,7 @@ def getKernelImageVersion():
         lines = open(glob('/var/lib/opkg/info/kernel-*.control')
                      [0], 'r').readlines()
         kernelimage = lines[1][:-1]
-    except:
+    except BaseException:
         kernelimage = getKernelVersionString
 
     return kernelimage
@@ -725,7 +743,7 @@ def getTypBoxa():
     try:
         lines = open('/etc/typboxa', 'r').readlines()
         typboxa = lines[0][:-1]
-    except:
+    except BaseException:
         typboxa = 'not detected'
 
     return typboxa
@@ -740,7 +758,7 @@ def getImageVersionString():
         tm = time.localtime(st.st_mtime)
         if tm.tm_year >= 2015:
             return time.strftime('%Y-%m-%d %H:%M:%S', tm)
-    except:
+    except BaseException:
         pass
 
     return _('unavailable')
@@ -819,19 +837,21 @@ def getKernelVersionString():
         kernelversion = f.read().split(' ', 4)[2].split('-', 2)[0]
         f.close()
         return kernelversion
-    except:
+    except BaseException:
         return _('unknown')
 
 
 def getHardwareTypeString():
     try:
         if os.path.isfile('/proc/stb/info/boxtype'):
-            return open('/proc/stb/info/boxtype').read().strip().upper() + ' (' + open('/proc/stb/info/board_revision').read().strip() + '-' + open('/proc/stb/info/version').read().strip() + ')'
+            return open('/proc/stb/info/boxtype').read().strip().upper() + ' (' + open(
+                '/proc/stb/info/board_revision').read().strip() + '-' + open('/proc/stb/info/version').read().strip() + ')'
         if os.path.isfile('/proc/stb/info/vumodel'):
-            return 'VU+' + open('/proc/stb/info/vumodel').read().strip().upper() + '(' + open('/proc/stb/info/version').read().strip().upper() + ')'
+            return 'VU+' + open('/proc/stb/info/vumodel').read().strip().upper() + \
+                '(' + open('/proc/stb/info/version').read().strip().upper() + ')'
         if os.path.isfile('/proc/stb/info/model'):
             return open('/proc/stb/info/model').read().strip().upper()
-    except:
+    except BaseException:
         pass
 
     return _('unavailable')
@@ -840,7 +860,7 @@ def getHardwareTypeString():
 def getImageTypeString():
     try:
         return open('/etc/issue').readlines()[-2].capitalize().strip()[:-6]
-    except:
+    except BaseException:
         pass
 
     return _('undefined')
@@ -848,8 +868,14 @@ def getImageTypeString():
 
 def getMachineBuild():
     try:
-        return open('/proc/version', 'r').read().split(' ', 4)[2].split('-', 2)[0]
-    except:
+        return open(
+            '/proc/version',
+            'r').read().split(
+            ' ',
+            4)[2].split(
+            '-',
+            2)[0]
+    except BaseException:
         return 'unknown'
 
 
@@ -862,7 +888,7 @@ def getVuBoxModel():
             BOX_NAME = str(model.lower().strip())
             l.close()
             BOX_MODEL = 'vuplus'
-        except:
+        except BaseException:
             BOX_MODEL = 'not detected'
 
     return BOX_MODEL
@@ -872,7 +898,7 @@ def getBoxModelVU():
     try:
         if os.path.isfile('/proc/stb/info/vumodel'):
             return open('/proc/stb/info/vumodel').read().strip().upper()
-    except:
+    except BaseException:
         pass
 
     return _('unavailable')
@@ -912,69 +938,113 @@ def getMachineProcModel():
 
 
 def getMountPointAll():
-    os.system('touch ' + LinkNeoBoot + '/files/mountpoint.sh; echo "#!/bin/sh\n"  >> ' +
-              LinkNeoBoot + '/files/mountpoint.sh; chmod 0755 ' + LinkNeoBoot + '/files/mountpoint.sh')
+    os.system(
+        'touch ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh; echo "#!/bin/sh\n"  >> ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh; chmod 0755 ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh')
     if getNeoMount() == 'hdd_install_/dev/sda1':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/hdd\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/hdd\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sdb1':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/hdd\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/hdd\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sda2':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sda2\n/bin/mount /dev/sda2 /media/hdd\n/bin/mount /dev/sda2 /media/sda2"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sda2\n/bin/mount /dev/sda2 /media/hdd\n/bin/mount /dev/sda2 /media/sda2"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sdb2':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sdb2\n/bin/mount /dev/sdb2 /media/hdd\n/bin/mount /dev/sdb2 /media/sdb2"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\nmkdir -p /media/sdb2\n/bin/mount /dev/sdb2 /media/hdd\n/bin/mount /dev/sdb2 /media/sdb2"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     if getNeoMount2() == 'usb_install_/dev/sdb1':
-        os.system('echo "\numount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/usb\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "\numount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/usb\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sda1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/sda1\n/bin/mount /dev/sda1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/sda1\n/bin/mount /dev/sda1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdb2':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdb2\n/bin/mount /dev/sdb2 /media/sdb2\n/bin/mount /dev/sdb2 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdb2\n/bin/mount /dev/sdb2 /media/sdb2\n/bin/mount /dev/sdb2 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdc1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdc1\n/bin/mount /dev/sdc1 /media/sdb2\n/bin/mount /dev/sdc1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdc1\n/bin/mount /dev/sdc1 /media/sdb2\n/bin/mount /dev/sdc1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdd1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdd1\n/bin/mount /dev/sdd1 /media/sdd1\n/bin/mount /dev/sdd1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdd1\n/bin/mount /dev/sdd1 /media/sdd1\n/bin/mount /dev/sdd1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sde1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sde1\n/bin/mount /dev/sde1 /media/sde1\n/bin/mount /dev/sde1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sde1\n/bin/mount /dev/sde1 /media/sde1\n/bin/mount /dev/sde1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdf1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdf1\n/bin/mount /dev/sdf1 /media/sdf1\n/bin/mount /dev/sdf1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdf1\n/bin/mount /dev/sdf1 /media/sdf1\n/bin/mount /dev/sdf1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdg1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdg1\n/bin/mount /dev/sdg1 /media/sdg1\n/bin/mount /dev/sdg1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdg1\n/bin/mount /dev/sdg1 /media/sdg1\n/bin/mount /dev/sdg1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdh1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdh1\n/bin/mount /dev/sdh1 /media/sdh1\n/bin/mount /dev/sdh1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\nmkdir -p /media/sdh1\n/bin/mount /dev/sdh1 /media/sdh1\n/bin/mount /dev/sdh1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount3() == 'cf_install_/dev/sda1':
-        os.system('echo "umount -l /media/cf\nmkdir -p /media/cf\nmkdir -p /media/sdb1\n/bin/mount /dev/sda1 /media/cf\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/cf\nmkdir -p /media/cf\nmkdir -p /media/sdb1\n/bin/mount /dev/sda1 /media/cf\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount3() == 'cf_install_/dev/sdb1':
-        os.system('echo "umount -l /media/cf\nmkdir -p /media/cf\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/cf\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/cf\nmkdir -p /media/cf\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/cf\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount4() == 'card_install_/dev/sda1':
-        os.system('echo "umount -l /media/card\nmkdir -p /media/card\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/card\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/card\nmkdir -p /media/card\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/card\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount4() == 'card_install_/dev/sdb1':
-        os.system('echo "umount -l /media/card\nmkdir -p /media/card\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/card\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/card\nmkdir -p /media/card\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/card\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount5() == 'mmc_install_/dev/sda1':
-        os.system('echo "umount -l /media/mmc\nmkdir -p /media/mmc\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/mmc\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/mmc\nmkdir -p /media/mmc\nmkdir -p /media/sda1\n/bin/mount /dev/sda1 /media/mmc\n/bin/mount /dev/sda1 /media/sda1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount5() == 'mmc_install_/dev/sdb1':
-        os.system('echo "umount -l /media/mmc\nmkdir -p /media/mmc\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/mmc\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/mmc\nmkdir -p /media/mmc\nmkdir -p /media/sdb1\n/bin/mount /dev/sdb1 /media/mmc\n/bin/mount /dev/sdb1 /media/sdb1"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     os.system('echo "\n\nexit 0"  >> ' + LinkNeoBoot + '/files/mountpoint.sh')
 
 
@@ -1038,69 +1108,113 @@ def getMountPointNeo():
 
 def getMountPointNeo2():
     # ---------------------------------------------
-    os.system('touch ' + LinkNeoBoot + '/files/mountpoint.sh; echo "#!/bin/sh"  > ' +
-              LinkNeoBoot + '/files/mountpoint.sh; chmod 0755 ' + LinkNeoBoot + '/files/mountpoint.sh')
+    os.system(
+        'touch ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh; echo "#!/bin/sh"  > ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh; chmod 0755 ' +
+        LinkNeoBoot +
+        '/files/mountpoint.sh')
     if getNeoMount() == 'hdd_install_/dev/sda1':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda1 /media/hdd"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda1 /media/hdd"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sdb1':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sdb1 /media/hdd"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sdb1 /media/hdd"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sda2':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda2 /media/hdd"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda2 /media/hdd"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount() == 'hdd_install_/dev/sdb2':
-        os.system('echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda2 /media/hdd"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/hdd\nmkdir -p /media/hdd\n/bin/mount /dev/sda2 /media/hdd"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     if getNeoMount2() == 'usb_install_/dev/sdb1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdb1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdb1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sda1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sda1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sda1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdb2':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdb2 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdb2 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdc1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdc1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdc1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdd1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdd1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdd1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sde1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sde1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sde1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdf1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdf1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdf1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdg1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdg1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdg1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount2() == 'usb_install_/dev/sdh1':
-        os.system('echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdh1 /media/usb"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/usb\nmkdir -p /media/usb\n/bin/mount /dev/sdh1 /media/usb"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount3() == 'cf_install_/dev/sda1':
-        os.system('echo "umount -l /media/cf\nmkdir -p /media/cf\n/bin/mount /dev/sda1 /media/cf"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/cf\nmkdir -p /media/cf\n/bin/mount /dev/sda1 /media/cf"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount3() == 'cf_install_/dev/sdb1':
-        os.system('echo "umount -l /media/cf\nmkdir -p /media/cf\n/bin/mount /dev/sdb1 /media/cf"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/cf\nmkdir -p /media/cf\n/bin/mount /dev/sdb1 /media/cf"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount4() == 'card_install_/dev/sda1':
-        os.system('echo "umount -l /media/card\nmkdir -p /media/card\n/bin/mount /dev/sda1 /media/card"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/card\nmkdir -p /media/card\n/bin/mount /dev/sda1 /media/card"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount4() == 'card_install_/dev/sdb1':
-        os.system('echo "umount -l /media/card\nmkdir -p /media/card\n/bin/mount /dev/sdb1 /media/card"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/card\nmkdir -p /media/card\n/bin/mount /dev/sdb1 /media/card"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     # ---------------------------------------------
     elif getNeoMount5() == 'mmc_install_/dev/sda1':
-        os.system('echo "umount -l /media/mmc\nmkdir -p /media/mmc\n/bin/mount /dev/sda1 /media/mmc"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/mmc\nmkdir -p /media/mmc\n/bin/mount /dev/sda1 /media/mmc"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     elif getNeoMount5() == 'mmc_install_/dev/sdb1':
-        os.system('echo "umount -l /media/mmc\nmkdir -p /media/mmc\n/bin/mount /dev/sdb1 /media/mmc"  >> ' +
-                  LinkNeoBoot + '/files/mountpoint.sh')
+        os.system(
+            'echo "umount -l /media/mmc\nmkdir -p /media/mmc\n/bin/mount /dev/sdb1 /media/mmc"  >> ' +
+            LinkNeoBoot +
+            '/files/mountpoint.sh')
     os.system('echo "\n\nexit 0"  >> ' + LinkNeoBoot + '/files/mountpoint.sh')
 
 
@@ -1247,9 +1361,11 @@ def getExtCheckHddUsb():
         with open('/proc/mounts', 'r') as f:
             lines = f.read()
             f.close()
-        if lines.find('/media/hdd ext4') != -1 or lines.find('/media/hdd type ext4') != -1 and os.path.exists('/media/hdd/ImageBoot'):
+        if lines.find('/media/hdd ext4') != -1 or lines.find(
+                '/media/hdd type ext4') != -1 and os.path.exists('/media/hdd/ImageBoot'):
             neoExt = 'ext4'
-        if lines.find('/media/usb ext4') != -1 or lines.find('/media/usb type ext4') != -1 and os.path.exists('/media/usb/ImageBoot'):
+        if lines.find('/media/usb ext4') != -1 or lines.find(
+                '/media/usb type ext4') != -1 and os.path.exists('/media/usb/ImageBoot'):
             neoExt = 'ext4'
     return neoExt
 
@@ -1272,11 +1388,12 @@ def getNandWrite():
 def getMyUUID():
     # os.system("tune2fs -l /dev/sd?? | awk '/UUID/ {print $NF}' > /tmp/.myuuid")
     os.system(
-        "tune2fs -l %s | awk '/UUID/ {print $NF}' > /tmp/.myuuid" % (getLocationMultiboot()))
+        "tune2fs -l %s | awk '/UUID/ {print $NF}' > /tmp/.myuuid" %
+        (getLocationMultiboot()))
     try:
         if os.path.isfile('/tmp/.myuuid'):
             return open('/tmp/.myuuid').read().strip().upper()
-    except:
+    except BaseException:
         pass
 
     return _('unavailable')
@@ -1301,7 +1418,8 @@ def getNeoActivatedtest():
         elif getTestToTest() != UPDATEVERSION:
             neoactivated = _('Update %s is available.') % getTestToTest()
         else:
-            if getCheckActivateVip() == getBoxMacAddres() and fileExists('/usr/lib/periodon/.kodn') and getTestToTest() == UPDATEVERSION:
+            if getCheckActivateVip() == getBoxMacAddres() and fileExists(
+                    '/usr/lib/periodon/.kodn') and getTestToTest() == UPDATEVERSION:
                 neoactivated = 'NEOBOOT VIP ACTIVATED'
 
     return neoactivated

@@ -4,7 +4,7 @@ import os
 import sys
 try:
     import argparse
-except:
+except BaseException:
     import argparse_neo
 from ubi import ubi, get_peb_size
 from ubifs import ubifs
@@ -15,15 +15,26 @@ if __name__ == '__main__':
     usage = 'ubi_extract_files.py [options] filepath'
     try:
         parser = argparse.ArgumentParser(usage=usage, description=description)
-    except:
+    except BaseException:
         parser = argparse_neo.ArgumentParser(
             usage=usage, description=description)
-    parser.add_argument('-l', '--log-file', dest='logpath',
-                        help='Log output to file output/LOGPATH. (default: ubifs_output.log)')
-    parser.add_argument('-k', '--keep-permissions', action='store_true', dest='permissions',
-                        help='Maintain file permissions, requires running as root. (default: False)')
-    parser.add_argument('-q', '--quiet', action='store_true', dest='quiet',
-                        help='Suppress warnings and non-fatal errors. (default: False)')
+    parser.add_argument(
+        '-l',
+        '--log-file',
+        dest='logpath',
+        help='Log output to file output/LOGPATH. (default: ubifs_output.log)')
+    parser.add_argument(
+        '-k',
+        '--keep-permissions',
+        action='store_true',
+        dest='permissions',
+        help='Maintain file permissions, requires running as root. (default: False)')
+    parser.add_argument(
+        '-q',
+        '--quiet',
+        action='store_true',
+        dest='quiet',
+        help='Suppress warnings and non-fatal errors. (default: False)')
     parser.add_argument('-p', '--peb-size', type=int,
                         dest='block_size', help='Specify PEB size.')
     parser.add_argument('-o', '--output-dir', dest='output_path',

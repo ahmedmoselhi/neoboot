@@ -66,7 +66,12 @@ def _ensure_value(namespace, name, value):
 
 class HelpFormatter(object):
 
-    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None):
+    def __init__(
+            self,
+            prog,
+            indent_increment=2,
+            max_help_position=24,
+            width=None):
         if width is None:
             try:
                 width = int(_os.environ['COLUMNS'])
@@ -178,7 +183,8 @@ class HelpFormatter(object):
         return help
 
     def _join_parts(self, part_strings):
-        return ''.join([part for part in part_strings if part and part is not SUPPRESS])
+        return ''.join(
+            [part for part in part_strings if part and part is not SUPPRESS])
 
     def _format_usage(self, usage, actions, groups, prefix):
         if prefix is None:
@@ -445,7 +451,11 @@ class HelpFormatter(object):
 
     def _fill_text(self, text, width, indent):
         text = self._whitespace_matcher.sub(' ', text).strip()
-        return _textwrap.fill(text, width, initial_indent=indent, subsequent_indent=indent)
+        return _textwrap.fill(
+            text,
+            width,
+            initial_indent=indent,
+            subsequent_indent=indent)
 
     def _get_help_string(self, action):
         return action.help
@@ -500,7 +510,9 @@ class ArgumentError(Exception):
             format = '%(message)s'
         else:
             format = 'argument %(argument_name)s: %(message)s'
-        return format % dict(message=self.message, argument_name=self.argument_name)
+        return format % dict(
+            message=self.message,
+            argument_name=self.argument_name)
 
 
 class ArgumentTypeError(Exception):
@@ -509,7 +521,18 @@ class ArgumentTypeError(Exception):
 
 class Action(_AttributeHolder):
 
-    def __init__(self, option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None):
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            nargs=None,
+            const=None,
+            default=None,
+            type=None,
+            choices=None,
+            required=False,
+            help=None,
+            metavar=None):
         self.option_strings = option_strings
         self.dest = dest
         self.nargs = nargs
@@ -539,14 +562,36 @@ class Action(_AttributeHolder):
 
 class _StoreAction(Action):
 
-    def __init__(self, option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None):
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            nargs=None,
+            const=None,
+            default=None,
+            type=None,
+            choices=None,
+            required=False,
+            help=None,
+            metavar=None):
         if nargs == 0:
             raise ValueError(
                 'nargs for store actions must be > 0; if you have nothing to store, actions such as store true or store const may be more appropriate')
         if const is not None and nargs != OPTIONAL:
             raise ValueError('nargs must be %r to supply const' % OPTIONAL)
-        super(_StoreAction, self).__init__(option_strings=option_strings, dest=dest, nargs=nargs, const=const,
-                                           default=default, type=type, choices=choices, required=required, help=help, metavar=metavar)
+        super(
+            _StoreAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=nargs,
+            const=const,
+            default=default,
+            type=type,
+            choices=choices,
+            required=required,
+            help=help,
+            metavar=metavar)
         return
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -555,9 +600,25 @@ class _StoreAction(Action):
 
 class _StoreConstAction(Action):
 
-    def __init__(self, option_strings, dest, const, default=None, required=False, help=None, metavar=None):
-        super(_StoreConstAction, self).__init__(option_strings=option_strings,
-                                                dest=dest, nargs=0, const=const, default=default, required=required, help=help)
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            const,
+            default=None,
+            required=False,
+            help=None,
+            metavar=None):
+        super(
+            _StoreConstAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=0,
+            const=const,
+            default=default,
+            required=required,
+            help=help)
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, self.const)
@@ -565,28 +626,76 @@ class _StoreConstAction(Action):
 
 class _StoreTrueAction(_StoreConstAction):
 
-    def __init__(self, option_strings, dest, default=False, required=False, help=None):
-        super(_StoreTrueAction, self).__init__(option_strings=option_strings,
-                                               dest=dest, const=True, default=default, required=required, help=help)
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            default=False,
+            required=False,
+            help=None):
+        super(
+            _StoreTrueAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            const=True,
+            default=default,
+            required=required,
+            help=help)
 
 
 class _StoreFalseAction(_StoreConstAction):
 
-    def __init__(self, option_strings, dest, default=True, required=False, help=None):
-        super(_StoreFalseAction, self).__init__(option_strings=option_strings,
-                                                dest=dest, const=False, default=default, required=required, help=help)
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            default=True,
+            required=False,
+            help=None):
+        super(
+            _StoreFalseAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            const=False,
+            default=default,
+            required=required,
+            help=help)
 
 
 class _AppendAction(Action):
 
-    def __init__(self, option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None):
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            nargs=None,
+            const=None,
+            default=None,
+            type=None,
+            choices=None,
+            required=False,
+            help=None,
+            metavar=None):
         if nargs == 0:
             raise ValueError(
                 'nargs for append actions must be > 0; if arg strings are not supplying the value to append, the append const action may be more appropriate')
         if const is not None and nargs != OPTIONAL:
             raise ValueError('nargs must be %r to supply const' % OPTIONAL)
-        super(_AppendAction, self).__init__(option_strings=option_strings, dest=dest, nargs=nargs, const=const,
-                                            default=default, type=type, choices=choices, required=required, help=help, metavar=metavar)
+        super(
+            _AppendAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=nargs,
+            const=const,
+            default=default,
+            type=type,
+            choices=choices,
+            required=required,
+            help=help,
+            metavar=metavar)
         return
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -597,9 +706,26 @@ class _AppendAction(Action):
 
 class _AppendConstAction(Action):
 
-    def __init__(self, option_strings, dest, const, default=None, required=False, help=None, metavar=None):
-        super(_AppendConstAction, self).__init__(option_strings=option_strings, dest=dest,
-                                                 nargs=0, const=const, default=default, required=required, help=help, metavar=metavar)
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            const,
+            default=None,
+            required=False,
+            help=None,
+            metavar=None):
+        super(
+            _AppendConstAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=0,
+            const=const,
+            default=default,
+            required=required,
+            help=help,
+            metavar=metavar)
 
     def __call__(self, parser, namespace, values, option_string=None):
         items = _copy.copy(_ensure_value(namespace, self.dest, []))
@@ -609,9 +735,22 @@ class _AppendConstAction(Action):
 
 class _CountAction(Action):
 
-    def __init__(self, option_strings, dest, default=None, required=False, help=None):
-        super(_CountAction, self).__init__(option_strings=option_strings,
-                                           dest=dest, nargs=0, default=default, required=required, help=help)
+    def __init__(
+            self,
+            option_strings,
+            dest,
+            default=None,
+            required=False,
+            help=None):
+        super(
+            _CountAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=0,
+            default=default,
+            required=required,
+            help=help)
 
     def __call__(self, parser, namespace, values, option_string=None):
         new_count = _ensure_value(namespace, self.dest, 0) + 1
@@ -620,9 +759,20 @@ class _CountAction(Action):
 
 class _HelpAction(Action):
 
-    def __init__(self, option_strings, dest=SUPPRESS, default=SUPPRESS, help=None):
-        super(_HelpAction, self).__init__(option_strings=option_strings,
-                                          dest=dest, default=default, nargs=0, help=help)
+    def __init__(
+            self,
+            option_strings,
+            dest=SUPPRESS,
+            default=SUPPRESS,
+            help=None):
+        super(
+            _HelpAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            default=default,
+            nargs=0,
+            help=help)
 
     def __call__(self, parser, namespace, values, option_string=None):
         parser.print_help()
@@ -631,9 +781,21 @@ class _HelpAction(Action):
 
 class _VersionAction(Action):
 
-    def __init__(self, option_strings, version=None, dest=SUPPRESS, default=SUPPRESS, help="show program's version number and exit"):
-        super(_VersionAction, self).__init__(option_strings=option_strings,
-                                             dest=dest, default=default, nargs=0, help=help)
+    def __init__(
+            self,
+            option_strings,
+            version=None,
+            dest=SUPPRESS,
+            default=SUPPRESS,
+            help="show program's version number and exit"):
+        super(
+            _VersionAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            default=default,
+            nargs=0,
+            help=help)
         self.version = version
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -654,13 +816,27 @@ class _SubParsersAction(Action):
             sup = super(_SubParsersAction._ChoicesPseudoAction, self)
             sup.__init__(option_strings=[], dest=name, help=help)
 
-    def __init__(self, option_strings, prog, parser_class, dest=SUPPRESS, help=None, metavar=None):
+    def __init__(
+            self,
+            option_strings,
+            prog,
+            parser_class,
+            dest=SUPPRESS,
+            help=None,
+            metavar=None):
         self._prog_prefix = prog
         self._parser_class = parser_class
         self._name_parser_map = _collections.OrderedDict()
         self._choices_actions = []
-        super(_SubParsersAction, self).__init__(option_strings=option_strings, dest=dest,
-                                                nargs=PARSER, choices=self._name_parser_map, help=help, metavar=metavar)
+        super(
+            _SubParsersAction,
+            self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=PARSER,
+            choices=self._name_parser_map,
+            help=help,
+            metavar=metavar)
 
     def add_parser(self, name, **kwargs):
         if kwargs.get('prog') is None:
@@ -741,7 +917,12 @@ class Namespace(_AttributeHolder):
 
 class _ActionsContainer(object):
 
-    def __init__(self, description, prefix_chars, argument_default, conflict_handler):
+    def __init__(
+            self,
+            description,
+            prefix_chars,
+            argument_default,
+            conflict_handler):
         super(_ActionsContainer, self).__init__()
         self.description = description
         self.argument_default = argument_default
@@ -997,14 +1178,31 @@ class _MutuallyExclusiveGroup(_ArgumentGroup):
 
 class ArgumentParser(_AttributeHolder, _ActionsContainer):
 
-    def __init__(self, prog=None, usage=None, description=None, epilog=None, version=None, parents=[], formatter_class=HelpFormatter, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True):
+    def __init__(
+            self,
+            prog=None,
+            usage=None,
+            description=None,
+            epilog=None,
+            version=None,
+            parents=[],
+            formatter_class=HelpFormatter,
+            prefix_chars='-',
+            fromfile_prefix_chars=None,
+            argument_default=None,
+            conflict_handler='error',
+            add_help=True):
         if version is not None:
             import warnings
             warnings.warn(
-                'The "version" argument to ArgumentParser is deprecated. Please use "add_argument(..., action=\'version\', version="N", ...)" instead', DeprecationWarning)
+                'The "version" argument to ArgumentParser is deprecated. Please use "add_argument(..., action=\'version\', version="N", ...)" instead',
+                DeprecationWarning)
         superinit = super(ArgumentParser, self).__init__
-        superinit(description=description, prefix_chars=prefix_chars,
-                  argument_default=argument_default, conflict_handler=conflict_handler)
+        superinit(
+            description=description,
+            prefix_chars=prefix_chars,
+            argument_default=argument_default,
+            conflict_handler=conflict_handler)
         if prog is None:
             prog = _os.path.basename(_sys.argv[0])
         self.prog = prog
@@ -1025,11 +1223,20 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         self.register('type', None, identity)
         default_prefix = '-' if '-' in prefix_chars else prefix_chars[0]
         if self.add_help:
-            self.add_argument(default_prefix + 'h', default_prefix * 2 + 'help',
-                              action='help', default=SUPPRESS, help=_('show this help message and exit'))
+            self.add_argument(
+                default_prefix + 'h',
+                default_prefix * 2 + 'help',
+                action='help',
+                default=SUPPRESS,
+                help=_('show this help message and exit'))
         if self.version:
-            self.add_argument(default_prefix + 'v', default_prefix * 2 + 'version', action='version',
-                              default=SUPPRESS, version=self.version, help=_("show program's version number and exit"))
+            self.add_argument(
+                default_prefix + 'v',
+                default_prefix * 2 + 'version',
+                action='version',
+                default=SUPPRESS,
+                version=self.version,
+                help=_("show program's version number and exit"))
         for parent in parents:
             self._add_container_actions(parent)
             try:
@@ -1496,7 +1703,8 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     def format_version(self):
         import warnings
         warnings.warn(
-            'The format_version method is deprecated -- the "version" argument to ArgumentParser is no longer supported.', DeprecationWarning)
+            'The format_version method is deprecated -- the "version" argument to ArgumentParser is no longer supported.',
+            DeprecationWarning)
         formatter = self._get_formatter()
         formatter.add_text(self.version)
         return formatter.format_help()
@@ -1519,7 +1727,8 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     def print_version(self, file=None):
         import warnings
         warnings.warn(
-            'The print_version method is deprecated -- the "version" argument to ArgumentParser is no longer supported.', DeprecationWarning)
+            'The print_version method is deprecated -- the "version" argument to ArgumentParser is no longer supported.',
+            DeprecationWarning)
         self._print_message(self.format_version(), file)
 
     def _print_message(self, message, file=None):

@@ -33,12 +33,23 @@ LinkNeoBoot = '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot'
 
 
 def getMmcBlockDevice():
-    if getBoxHostName() == 'vuultimo' or getBoxHostName() == 'bm750' or getBoxHostName() == 'vuduo' or getBoxHostName() == 'vuuno' or getBoxHostName() == 'vusolo' or getBoxHostName() == 'vuduo':
+    if getBoxHostName() == 'vuultimo' or getBoxHostName() == 'bm750' or getBoxHostName(
+    ) == 'vuduo' or getBoxHostName() == 'vuuno' or getBoxHostName() == 'vusolo' or getBoxHostName() == 'vuduo':
         mmcblockdevice = 'mtd1'
-        if fileExists('' + getNeoLocation() + 'ImageBoot/' + getImageNeoBoot() + '/etc/vtiversion.info') and getExtCheckHddUsb() == 'ext4':
-            if fileExists('%sImageBoot/%s/boot/%s.vmlinux.gz' % (getNeoLocation(), getImageNeoBoot(), getBoxHostName())):
-                os.system('rm -r %sImageBoot/%s/boot/%s.vmlinux.gz' %
-                          (getNeoLocation(), getImageNeoBoot(), getBoxHostName()))
+        if fileExists(
+            '' +
+            getNeoLocation() +
+            'ImageBoot/' +
+            getImageNeoBoot() +
+                '/etc/vtiversion.info') and getExtCheckHddUsb() == 'ext4':
+            if fileExists(
+                '%sImageBoot/%s/boot/%s.vmlinux.gz' %
+                (getNeoLocation(),
+                 getImageNeoBoot(),
+                 getBoxHostName())):
+                os.system(
+                    'rm -r %sImageBoot/%s/boot/%s.vmlinux.gz' %
+                    (getNeoLocation(), getImageNeoBoot(), getBoxHostName()))
     elif getBoxHostName() == 'vusolo2' or getBoxHostName() == 'vusolose' or getBoxHostName() == 'vuduo2' or getBoxHostName() == 'vuzero':
         mmcblockdevice = 'mtd2'
     return mmcblockdevice
@@ -80,8 +91,8 @@ class StartImage(Screen):
         self.list = []
         self['list'] = List(self.list)
         self.select()
-        self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {'ok': self.KeyOk,
-                                                                        'back': self.close})
+        self['actions'] = ActionMap(['WizardActions', 'ColorActions'], {
+                                    'ok': self.KeyOk, 'back': self.close})
         self['label1'] = Label(_('Start the chosen system now ?'))
         self['label2'] = Label(_('Select OK to run the image.'))
 
@@ -114,7 +125,9 @@ class StartImage(Screen):
 
     def StartImageInNeoBoot(self):
         if getImageNeoBoot() != 'Flash':
-            if fileExists('%sImageBoot/%s/.control_ok' % (getNeoLocation(), getImageNeoBoot())):
+            if fileExists(
+                '%sImageBoot/%s/.control_ok' %
+                    (getNeoLocation(), getImageNeoBoot())):
                 system('touch /tmp/.control_ok ')
             else:
                 system('touch %sImageBoot/%s/.control_boot_new_image ' %
@@ -136,9 +149,13 @@ class StartImage(Screen):
             # VUPLUS MIPS vu_dev_mtd1.sh
             if "vu" + getBoxVuModel() == getBoxHostName():
                 getMmcBlockDevice()
-                if not fileExists('%sImagesUpload/.kernel/%s.vmlinux.gz' % (getNeoLocation(), getBoxHostName())):
+                if not fileExists(
+                    '%sImagesUpload/.kernel/%s.vmlinux.gz' %
+                        (getNeoLocation(), getBoxHostName())):
                     self.myclose2(
-                        _('Error - in the location %sImagesUpload/.kernel/ \nkernel file not found flash kernel vmlinux.gz ' % getNeoLocation()))
+                        _(
+                            'Error - in the location %sImagesUpload/.kernel/ \nkernel file not found flash kernel vmlinux.gz ' %
+                            getNeoLocation()))
                 else:
                     if getImageNeoBoot() == 'Flash':
                         if fileExists('/.multinfo'):
@@ -166,7 +183,8 @@ class StartImage(Screen):
                             cmd4 = 'sleep 8; reboot -d -f'
 
                     elif getImageNeoBoot() != 'Flash':
-                        if fileExists('/.multinfo') and getImageNeoBoot() == getImageBootNow():
+                        if fileExists(
+                                '/.multinfo') and getImageNeoBoot() == getImageBootNow():
                             cmd = "echo -e '\n%s '" % _(
                                 '...............NEOBOOT > REBOOT...............\nPlease wait, in a moment the decoder will be restarted...')
                             cmd1 = 'ln -sfn /sbin/init.sysvinit /sbin/init'
@@ -176,7 +194,14 @@ class StartImage(Screen):
                             cmd4 = 'sync; sleep 8; reboot -d -f '
 
                         elif not fileExists('/.multinfo'):
-                            if fileExists('' + getNeoLocation() + 'ImageBoot/' + getImageNeoBoot() + '/boot/' + getBoxHostName() + '.vmlinux.gz'):
+                            if fileExists(
+                                '' +
+                                getNeoLocation() +
+                                'ImageBoot/' +
+                                getImageNeoBoot() +
+                                '/boot/' +
+                                getBoxHostName() +
+                                    '.vmlinux.gz'):
                                 cmd = "echo -e '\n%s '" % _(
                                     '...............NEOBOOT-REBOOT...............\nPlease wait, in a moment the decoder will be restarted...')
                                 cmd1 = 'flash_erase /dev/' + getMmcBlockDevice() + ' 0 0 > /dev/null 2>&1; flash_eraseall /dev/' + \
@@ -202,7 +227,9 @@ class StartImage(Screen):
                                 cmd4 = 'sync; sleep 8; reboot -d -f'
 
                         elif fileExists('/.multinfo'):
-                            if not fileExists('%sImageBoot/%s/boot/%s.vmlinux.gz' % (getNeoLocation(), getImageNeoBoot(), getBoxHostName())):
+                            if not fileExists(
+                                '%sImageBoot/%s/boot/%s.vmlinux.gz' %
+                                    (getNeoLocation(), getImageNeoBoot(), getBoxHostName())):
                                 cmd = "echo -e '\n%s '" % _(
                                     '...............NeoBoot  REBOOT...............\nPlease wait, in a moment the decoder will be restarted...')
                                 cmd1 = 'flash_erase /dev/' + getMmcBlockDevice() + ' 0 0 > /dev/null 2>&1 ; flash_eraseall /dev/' + \
@@ -240,8 +267,11 @@ class StartImage(Screen):
             else:
                 os.system('echo "Flash "  >> ' + getNeoLocation() +
                           'ImageBoot/.neonextboot')
-                self.messagebox = self.session.open(MessageBox, _(
-                    'It looks like it that multiboot does not support this STB.'), MessageBox.TYPE_INFO, 8)
+                self.messagebox = self.session.open(
+                    MessageBox,
+                    _('It looks like it that multiboot does not support this STB.'),
+                    MessageBox.TYPE_INFO,
+                    8)
                 self.close()
 
     def myclose2(self, message):

@@ -40,7 +40,8 @@ def parse_key(key):
 
 def decompress(ctype, unc_len, data):
     # if ctype == UBIFS_COMPR_LZO:
-    # return lzo.decompress(''.join(('\xf0', struct.pack('>I', unc_len), data)))
+    # return lzo.decompress(''.join(('\xf0', struct.pack('>I', unc_len),
+    # data)))
     if ctype == UBIFS_COMPR_ZLIB:
         return zlib.decompress(data, -11)
     else:

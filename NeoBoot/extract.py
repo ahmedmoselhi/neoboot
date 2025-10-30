@@ -11,9 +11,42 @@ import shutil
 # --------------------------------------------- 2024 ---------------------------------------------#
 
 
-def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterowniki, Montowanie, InstallSettings, ZipDelete, RepairFTP, SoftCam, MediaPortal, PiconR, Kodi, BlackHole, Nandsim):
-    NEOBootR(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterowniki, Montowanie,
-             InstallSettings, ZipDelete, RepairFTP, SoftCam, MediaPortal, PiconR, Kodi, BlackHole, Nandsim)
+def NEOBootMainEx(
+        source,
+        target,
+        CopyFiles,
+        CopyKernel,
+        TvList,
+        LanWlan,
+        Sterowniki,
+        Montowanie,
+        InstallSettings,
+        ZipDelete,
+        RepairFTP,
+        SoftCam,
+        MediaPortal,
+        PiconR,
+        Kodi,
+        BlackHole,
+        Nandsim):
+    NEOBootR(
+        source,
+        target,
+        CopyFiles,
+        CopyKernel,
+        TvList,
+        LanWlan,
+        Sterowniki,
+        Montowanie,
+        InstallSettings,
+        ZipDelete,
+        RepairFTP,
+        SoftCam,
+        MediaPortal,
+        PiconR,
+        Kodi,
+        BlackHole,
+        Nandsim)
 
 
 def LanguageUsed():
@@ -50,7 +83,8 @@ def getCPUSoC():
 
 def getBoxVuModel():
     vumodel = 'UNKNOWN'
-    if os.path.exists("/proc/stb/info/vumodel") and not os.path.exists("/proc/stb/info/boxtype"):
+    if os.path.exists(
+            "/proc/stb/info/vumodel") and not os.path.exists("/proc/stb/info/boxtype"):
         with open('/proc/stb/info/vumodel', 'r') as f:
             vumodel = f.readline().strip()
             f.close()
@@ -72,28 +106,41 @@ def getCPUtype():
 
 def getKernelVersion():
     if not os.path.exists('/tmp/.isnandsim'):
-        if os.system('opkg list-installed | grep kernel-module-nandsim' + dev_null) != 0:
+        if os.system(
+            'opkg list-installed | grep kernel-module-nandsim' +
+                dev_null) != 0:
             os.system('touch /tmp/.isnandsim')
 
-    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/dm520') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/dm525'):
+    if os.path.exists('' +
+                      getNeoLocation() +
+                      'ImagesUpload/dm520') or os.path.exists('' +
+                                                              getNeoLocation() +
+                                                              'ImagesUpload/dm525'):
         try:
             result = popen('uname -r', 'r').read().strip('\n').split('-')
             kernel_version = result[0]
             return kernel_version
-        except:
+        except BaseException:
             os.system('uname -r > /tmp/.uname_r')
             return open('/tmp/.uname_r').read().strip().upper()
     else:
         try:
-            return open('/proc/version', 'r').read().split(' ', 4)[2].split('-', 2)[0]
-        except:
+            return open(
+                '/proc/version',
+                'r').read().split(
+                ' ',
+                4)[2].split(
+                '-',
+                2)[0]
+        except BaseException:
             os.system('uname -r > /tmp/.uname_r')
             return open('/tmp/.uname_r').read().strip().upper()
 
 
 def getNeoLocation():
     locatino = 'UNKNOWN'
-    if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
+    if os.path.exists(
+            '/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location'):
         with open('/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/.location', 'r') as f:
             locatino = f.readline().strip()
             f.close()
@@ -107,7 +154,24 @@ dev_null = ' > /dev/null 2>&1'
 supportedTuners = 'vuplus'
 
 
-def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterowniki, Montowanie, InstallSettings, ZipDelete, RepairFTP, SoftCam, MediaPortal, PiconR, Kodi, BlackHole, Nandsim):
+def NEOBootMainEx(
+        source,
+        target,
+        CopyFiles,
+        CopyKernel,
+        TvList,
+        LanWlan,
+        Sterowniki,
+        Montowanie,
+        InstallSettings,
+        ZipDelete,
+        RepairFTP,
+        SoftCam,
+        MediaPortal,
+        PiconR,
+        Kodi,
+        BlackHole,
+        Nandsim):
     media_target = mediahome + target
     list_one = ['rm -r ' + media_target + dev_null, 'mkdir ' +
                 media_target + dev_null, 'chmod -R 0777 ' + media_target]
@@ -118,19 +182,26 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
 
     os.system('sync; echo 1 > /proc/sys/vm/drop_caches')
 
-    if not os.path.exists('%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions' % (media, target)):
+    if not os.path.exists(
+        '%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions' %
+            (media, target)):
         os.system('mkdir -p %s/ImageBoot/%s/usr/lib/' % (media, target))
         os.system('mkdir -p %s/ImageBoot/%s/usr/lib/enigma2' % (media, target))
         os.system('mkdir -p %s/ImageBoot/%s/usr/lib/enigma2/python' %
                   (media, target))
         os.system(
-            'mkdir -p %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins' % (media, target))
+            'mkdir -p %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins' %
+            (media, target))
         os.system(
-            'mkdir -p %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions' % (media, target))
+            'mkdir -p %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions' %
+            (media, target))
 
-    if os.path.exists('%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot' % (media, target)):
+    if os.path.exists(
+        '%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot' %
+            (media, target)):
         os.system(
-            'rm -r %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot' % (media, target))
+            'rm -r %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot' %
+            (media, target))
 
     list_two = ['mkdir -p ' + media_target + '/media' + dev_null,
                 'rm ' + media_target + media + dev_null,
@@ -162,7 +233,8 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
 
     if CopyKernel == 'True':
         # mips vuplus
-        if getBoxHostName() == 'vuultimo' or getCPUSoC() == '7405' and os.path.exists('%s/ImageBoot/%s/etc/vtiversion.info' % (media, target)):
+        if getBoxHostName() == 'vuultimo' or getCPUSoC() == '7405' and os.path.exists(
+                '%s/ImageBoot/%s/etc/vtiversion.info' % (media, target)):
             if os.path.exists('%s/ImageBoot/%s/lib/modules' % (media, target)):
                 cmd = 'rm -r %s/ImageBoot/%s/lib/modules' % (media, target)
                 rc = os.system(cmd)
@@ -172,7 +244,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             cmd = 'cp -af /lib/modules  %s/ImageBoot/%s/lib  > /dev/null 2>&1' % (
                 media, target)
             rc = os.system(cmd)
-            if os.path.exists('%s/ImageBoot/%s/lib/firmware' % (media, target)):
+            if os.path.exists(
+                '%s/ImageBoot/%s/lib/firmware' %
+                    (media, target)):
                 cmd = 'rm -r %s/ImageBoot/%s/lib/firmware' % (media, target)
                 rc = os.system(cmd)
             cmd = 'mkdir -p %s/ImageBoot/%s/lib/firmware > /dev/null 2>&1' % (
@@ -184,20 +258,50 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             os.system(
                 'echo "Copied system drivers. Not recommended copied kernel.bin for Ultimo HD."')
         elif getCPUtype() == "MIPS" and getBoxHostName() == 'vuultimo' or getBoxHostName() == 'bm750' or getBoxHostName() == 'vuduo' or getBoxHostName() == 'vuuno' or getBoxHostName() == 'vusolo' or getBoxHostName() == 'vuduo' or getBoxHostName() == 'vusolo2' or getBoxHostName() == 'vusolose' or getBoxHostName() == 'vuduo2' or getBoxHostName() == 'vuzero' or getBoxHostName() == 'mbultra':
-            os.system('mv ' + getNeoLocation() + 'ImagesUpload/vuplus/' + getBoxVuModel() +
-                      '/kernel_cfe_auto.bin ' + media_target + '/boot/' + getBoxHostName() + '.vmlinux.gz' + dev_null)
+            os.system(
+                'mv ' +
+                getNeoLocation() +
+                'ImagesUpload/vuplus/' +
+                getBoxVuModel() +
+                '/kernel_cfe_auto.bin ' +
+                media_target +
+                '/boot/' +
+                getBoxHostName() +
+                '.vmlinux.gz' +
+                dev_null)
             os.system('echo "Copied kernel.bin STB-MIPS"')
         elif getCPUtype() == "MIPS" and getBoxHostName() == 'et5x00':
-            os.system('mv ' + getNeoLocation() + 'ImagesUpload/' + getBoxHostName() +
-                      '/kernel.bin ' + media_target + '/boot/' + getBoxHostName() + '.vmlinux.gz' + dev_null)
+            os.system(
+                'mv ' +
+                getNeoLocation() +
+                'ImagesUpload/' +
+                getBoxHostName() +
+                '/kernel.bin ' +
+                media_target +
+                '/boot/' +
+                getBoxHostName() +
+                '.vmlinux.gz' +
+                dev_null)
             os.system('echo "Copied kernel.bin STB-MIPS Clarke-Tech & Xtrend"')
         # arm vuplus arms
         elif getCPUtype() == "ARMv7" and getBoxHostName() == "vuultimo4k" or getBoxHostName() == "vusolo4k" or getBoxHostName() == "vuuno4k" or getBoxHostName() == "vuuno4kse" or getBoxHostName() == "vuduo4k" or getBoxHostName() == "vuduo4kse" or getBoxHostName() == "vuzero4k":
-            os.system('mv ' + getNeoLocation() + 'ImagesUpload/vuplus/' + getBoxVuModel() +
-                      '/kernel_auto.bin ' + media_target + '/boot/zImage.' + getBoxHostName() + '' + dev_null)
+            os.system(
+                'mv ' +
+                getNeoLocation() +
+                'ImagesUpload/vuplus/' +
+                getBoxVuModel() +
+                '/kernel_auto.bin ' +
+                media_target +
+                '/boot/zImage.' +
+                getBoxHostName() +
+                '' +
+                dev_null)
             os.system('echo "Copied kernel.bin STB-ARM"')
 
-    if not os.path.exists('' + getNeoLocation() + 'ImageBoot/.without_copying'):
+    if not os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImageBoot/.without_copying'):
         if os.path.exists('/usr/sbin/nandwrite'):
             cmd = 'cp -af /usr/sbin/nandwrite %s/ImageBoot/%s/usr/sbin/nandwrite > /dev/null 2>&1' % (
                 media, target)
@@ -218,7 +322,8 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             cmd = 'cp -af /etc/inadyn.conf %s/ImageBoot/%s/etc/inadyn.conf > /dev/null 2>&1' % (
                 media, target)
             rc = os.system(cmd)
-        if os.path.exists('/usr/lib/enigma2/python/Plugins/SystemPlugins/FanControl'):
+        if os.path.exists(
+                '/usr/lib/enigma2/python/Plugins/SystemPlugins/FanControl'):
             cmd = 'cp -af /usr/lib/enigma2/python/Plugins/SystemPlugins/FanControl %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/SystemPlugins > /dev/null 2>&1' % (
                 media, target)
             rc = os.system(cmd)
@@ -260,16 +365,23 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 'TempFanControl %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/TempFanControl > /dev/null 2>&1' % (
                     media, target)
             rc = os.system(cmd)
-        if not os.path.exists('%s/ImageBoot/%s/usr/lib/enigma2/python/boxbranding.so' % (media, target)):
+        if not os.path.exists(
+            '%s/ImageBoot/%s/usr/lib/enigma2/python/boxbranding.so' %
+                (media, target)):
             cmd = 'cp -af /usr/lib/enigma2/python/boxbranding.so %s/ImageBoot/%s/usr/lib/enigma2/python/boxbranding.so > /dev/null 2>&1' % (
                 media, target)
             rc = os.system(cmd)
-        if os.path.exists('%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/HbbTV' % (media, target)):
+        if os.path.exists(
+            '%s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/HbbTV' %
+                (media, target)):
             os.system(
-                'rm -rf %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/HbbTV' % (media, target))
+                'rm -rf %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/HbbTV' %
+                (media, target))
 
         if TvList == 'True':
-            if not os.path.exists('%s/ImageBoot/%s/etc/enigma2' % (media, target)):
+            if not os.path.exists(
+                '%s/ImageBoot/%s/etc/enigma2' %
+                    (media, target)):
                 cmd = 'mkdir -p %s/ImageBoot/%s/etc/enigma2' % (media, target)
                 rc = os.system(cmd)
             cmd = 'cp /etc/enigma2/*.tv %s/ImageBoot/%s/etc/enigma2' % (
@@ -287,7 +399,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             os.system('echo "Copied TV list..."')
 
         if LanWlan == 'True':
-            if os.path.exists('%s/ImageBoot/%s/etc/vtiversion.info' % (media, target)):
+            if os.path.exists(
+                '%s/ImageBoot/%s/etc/vtiversion.info' %
+                    (media, target)):
                 os.system(
                     'echo "Not copied LAN-WLAN, not recommended for this image."')
             elif os.path.exists('/etc/vtiversion.info') and os.path.exists('%s/usr/lib/enigma2/python/Plugins/PLi' % (media, target)):
@@ -328,7 +442,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             cmd = 'cp -af /lib/modules  %s/ImageBoot/%s/lib  > /dev/null 2>&1' % (
                 media, target)
             rc = os.system(cmd)
-            if os.path.exists('%s/ImageBoot/%s/lib/firmware' % (media, target)):
+            if os.path.exists(
+                '%s/ImageBoot/%s/lib/firmware' %
+                    (media, target)):
                 cmd = 'rm -r %s/ImageBoot/%s/lib/firmware' % (media, target)
                 rc = os.system(cmd)
             cmd = 'mkdir -p %s/ImageBoot/%s/lib/firmware > /dev/null 2>&1' % (
@@ -341,17 +457,17 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
 
         if Montowanie == 'True':
             if getCPUtype() == "MIPS":
-                if os.path.exists('%s/ImageBoot/%s/etc/fstab' % (media, target)):
-                    cmd = 'mv %s/ImageBoot/%s/etc/fstab %s/ImageBoot/%s/etc/fstab.org' % (media,
-                                                                                          target,
-                                                                                          media,
-                                                                                          target)
+                if os.path.exists(
+                    '%s/ImageBoot/%s/etc/fstab' %
+                        (media, target)):
+                    cmd = 'mv %s/ImageBoot/%s/etc/fstab %s/ImageBoot/%s/etc/fstab.org' % (
+                        media, target, media, target)
                     rc = os.system(cmd)
-                if os.path.exists('%s/ImageBoot/%s/etc/init.d/volatile-media.sh' % (media, target)):
-                    cmd = 'mv %s/ImageBoot/%s/etc/init.d/volatile-media.sh %s/ImageBoot/%s/etc/init.d/volatile-media.sh.org' % (media,
-                                                                                                                                target,
-                                                                                                                                media,
-                                                                                                                                target)
+                if os.path.exists(
+                    '%s/ImageBoot/%s/etc/init.d/volatile-media.sh' %
+                        (media, target)):
+                    cmd = 'mv %s/ImageBoot/%s/etc/init.d/volatile-media.sh %s/ImageBoot/%s/etc/init.d/volatile-media.sh.org' % (
+                        media, target, media, target)
                     rc = os.system(cmd)
                 cmd = 'cp -r /etc/fstab %s/ImageBoot/%s/etc/fstab' % (
                     media, target)
@@ -361,13 +477,17 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 os.system('echo "No copied mount ARM..."')
 
         if InstallSettings == 'True':
-            if not os.path.exists('%s/ImageBoot/%s/etc/enigma2' % (media, target)):
+            if not os.path.exists(
+                '%s/ImageBoot/%s/etc/enigma2' %
+                    (media, target)):
                 cmd = 'mkdir -p %s/ImageBoot/%s/etc/enigma2' % (media, target)
                 rc = os.system(cmd)
             cmd = 'cp /etc/enigma2/settings %s/ImageBoot/%s/etc/enigma2' % (
                 media, target)
             rc = os.system(cmd)
-            if not os.path.exists('%s/ImageBoot/%s/etc/tuxbox/config' % (media, target)):
+            if not os.path.exists(
+                '%s/ImageBoot/%s/etc/tuxbox/config' %
+                    (media, target)):
                 cmd = 'mkdir -p /etc/tuxbox/config %s/ImageBoot/%s/etc/tuxbox/config' % (
                     media, target)
                 rc = os.system(cmd)
@@ -381,7 +501,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 'touch /tmp/settings_copied; echo "System settings copied..."')
 
         if RepairFTP == 'True':
-            if os.path.exists('%s/ImageBoot/%s/etc/vsftpd.conf' % (media, target)):
+            if os.path.exists(
+                '%s/ImageBoot/%s/etc/vsftpd.conf' %
+                    (media, target)):
                 filename = media + '/ImageBoot/' + target + '/etc/vsftpd.conf'
                 if os.path.exists(filename):
                     filename2 = filename + '.tmp'
@@ -439,7 +561,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                     media, target)
                 rc = os.system(cmd)
 
-                if not os.path.exists('%s/ImageBoot/%s/etc/enigma2' % (media, target)):
+                if not os.path.exists(
+                    '%s/ImageBoot/%s/etc/enigma2' %
+                        (media, target)):
                     cmd = 'mkdir -p %s/ImageBoot/%s/etc/enigma2' % (
                         media, target)
                     rc = os.system(cmd)
@@ -489,7 +613,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                     os.system('echo "Kodi not found."')
 
         if BlackHole == 'True':
-            if 'BlackHole' in source or os.path.exists('%s/ImageBoot/%s/usr/lib/enigma2/python/Blackhole' % (media, target)):
+            if 'BlackHole' in source or os.path.exists(
+                '%s/ImageBoot/%s/usr/lib/enigma2/python/Blackhole' %
+                    (media, target)):
                 cmd = 'mkdir -p ' + getNeoLocation() + 'ImageBoot/%s/boot/blackhole' % target
                 rc = os.system(cmd)
                 cmd = 'mv ' + getNeoLocation() + 'ImageBoot/' + target + '/usr/lib/enigma2/python/Blackhole/BhUtils.pyo ' + \
@@ -501,7 +627,7 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 ver = source.replace('BlackHole-', '')
                 try:
                     text = ver.split('-')[0]
-                except:
+                except BaseException:
                     text = ''
                 localfile = '' + getNeoLocation() + 'ImageBoot/%s/boot/blackhole/version' % target
                 temp_file = open(localfile, 'w')
@@ -561,8 +687,12 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
             cmd5 = 'cp -af /etc/init.d/tailscal* ' + \
                 getNeoLocation() + 'ImageBoot/%s/etc/init.d/' % target
             rc = os.system(cmd5)
-            if not os.path.exists('%s/ImageBoot/%s/lib/modules/kernel/drivers/net/tun.ko' % (media, target)):
-                if not os.path.exists('%s/ImageBoot/%s/lib/modules/kernel/drivers/net' % (media, target)):
+            if not os.path.exists(
+                '%s/ImageBoot/%s/lib/modules/kernel/drivers/net/tun.ko' %
+                    (media, target)):
+                if not os.path.exists(
+                    '%s/ImageBoot/%s/lib/modules/kernel/drivers/net' %
+                        (media, target)):
                     # cmd = 'mkdir -p ' + getNeoLocation() + 'ImageBoot/%s/lib/modules/' + getKernelVersion() + '/kernel/drivers/net/' % target
                     cmd = 'mkdir -p %s/ImageBoot/%s/lib/modules/kernel/drivers/net/' % (
                         media, target)
@@ -571,7 +701,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                         '/kernel/drivers/net/tun.ko %s/ImageBoot/%s/lib/modules/kernel/drivers/net/' % (
                             media, target)
                     rc = os.system(cmd)
-            if not os.path.exists('%s/ImageBoot/%s/var/run/tailscale' % (media, target)):
+            if not os.path.exists(
+                '%s/ImageBoot/%s/var/run/tailscale' %
+                    (media, target)):
                 cmd = 'mkdir -p ' + getNeoLocation() + '/ImageBoot/%s/run/tailscale/' % target
                 rc = os.system(cmd)
             if os.path.exists('/run/tailscale'):
@@ -583,23 +715,28 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 rc = os.system(cmd1)
 
         if os.path.exists('%s/ImageBoot/%s/etc/init.d' % (media, target)):
-            cmd = 'ln -s %sImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/files/userscript.sh %sImageBoot/%s/etc/rcS.d/S99neo.local' % (media,
-                                                                                                                                                        target,
-                                                                                                                                                        media,
-                                                                                                                                                        target)
+            cmd = 'ln -s %sImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/files/userscript.sh %sImageBoot/%s/etc/rcS.d/S99neo.local' % (
+                media, target, media, target)
 
         elif not os.path.exists('%s/ImageBoot/%s/etc/init.d' % (media, target)):
             os.system('echo "/etc/init.d not found."')
         os.system('echo "Copied file neo_userscript.sh"')
 
-    if not os.path.exists('' + getNeoLocation() + 'ImageBoot/.without_copying') and not os.path.exists(' /tmp/settings_copied'):
+    if not os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImageBoot/.without_copying') and not os.path.exists(' /tmp/settings_copied'):
         for line in open("/etc/hostname"):
             if getCPUtype() == 'MIPS' and "dm500hd" in line or "dm800se" in line or "dm800" in line or "dm800se" in line or "dm8000" in line:
-                if os.path.exists('%s/ImageBoot/%s/etc/enigma2' % (media, target)):
+                if os.path.exists(
+                    '%s/ImageBoot/%s/etc/enigma2' %
+                        (media, target)):
                     cmd = 'rm -r %s/ImageBoot/%s/etc/enigma2' % (media, target)
                     rc = os.system(cmd)
             else:
-                if not os.path.exists('%s/ImageBoot/%s/etc/enigma2' % (media, target)):
+                if not os.path.exists(
+                    '%s/ImageBoot/%s/etc/enigma2' %
+                        (media, target)):
                     cmd = 'mkdir -p %s/ImageBoot/%s/etc/enigma2' % (
                         media, target)
                     rc = os.system(cmd)
@@ -629,7 +766,12 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                 rc = os.system(cmd6)
 
 #####################################
-        if not os.path.exists('' + media_target + '/boot/zImage.' + getBoxHostName() + '') and getCPUtype() == 'MIPS':
+        if not os.path.exists(
+            '' +
+            media_target +
+            '/boot/zImage.' +
+            getBoxHostName() +
+                '') and getCPUtype() == 'MIPS':
             namefile = media + '/ImageBoot/' + target + '/etc/fstab'
             namefile2 = namefile + '.tmp'
             if os.path.exists(namefile2):
@@ -767,7 +909,9 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
                     rc = os.system(cmd)
 
             # _______________________________________________status1 zmienione
-            if os.path.exists('%s/ImageBoot/%s/var/lib/opkg/status1' % (media, target)):
+            if os.path.exists(
+                '%s/ImageBoot/%s/var/lib/opkg/status1' %
+                    (media, target)):
                 cmd = 'mv ' + getNeoLocation() + 'ImageBoot/' + target + '/var/lib/opkg/status ' + \
                     getNeoLocation() + 'ImageBoot/%s/var/lib/opkg/status-or' % target
                 rc = os.system(cmd)
@@ -806,8 +950,14 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
     os.system('mkdir -p ' + media_target + '/media/hdd' + dev_null)
     os.system('mkdir -p ' + media_target + '/media/usb' + dev_null)
     os.system('mkdir -p ' + media_target + '/var/lib/opkg/info/' + dev_null)
-    os.system('touch ' + getNeoLocation() + 'ImageBoot/.data; echo "Data instalacji image" > ' +
-              getNeoLocation() + 'ImageBoot/.data; echo " "; date  > ' + getNeoLocation() + 'ImageBoot/.data')
+    os.system(
+        'touch ' +
+        getNeoLocation() +
+        'ImageBoot/.data; echo "Data instalacji image" > ' +
+        getNeoLocation() +
+        'ImageBoot/.data; echo " "; date  > ' +
+        getNeoLocation() +
+        'ImageBoot/.data')
     os.system('mv -f ' + getNeoLocation() + 'ImageBoot/.data ' +
               getNeoLocation() + 'ImageBoot/%s/.data' % target)
     cmd = 'touch /tmp/.init_reboot'
@@ -820,7 +970,8 @@ def NEOBootMainEx(source, target, CopyFiles, CopyKernel, TvList, LanWlan, Sterow
     out = open(mediahome + '.neonextboot', 'w')
     out.write('Flash')
     out.close()
-    if '.tar.xz' not in source and not os.path.exists('' + getNeoLocation() + '/ImageBoot/%s/etc/issue' % target):
+    if '.tar.xz' not in source and not os.path.exists(
+            '' + getNeoLocation() + '/ImageBoot/%s/etc/issue' % target):
         os.system('echo ""; echo "No system installed! The reason for the installation error may be badly packed image files or it is not a system for your model."')
         os.system(
             'echo "The installed system may not start. Check the correctness of the installed image directory!!!"')
@@ -930,87 +1081,222 @@ def RemoveUnpackDirs():
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/dreamtwo '):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/dreamtwo ')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/multibox') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/multiboxse'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/multibox ' + getNeoLocation() +
-                       'ImagesUpload/multibox; rm -r ' + getNeoLocation() + 'ImagesUpload/multibox')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/multibox ' +
+            getNeoLocation() +
+            'ImagesUpload/multibox; rm -r ' +
+            getNeoLocation() +
+            'ImagesUpload/multibox')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/octagon/sf8008'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/usb_update.bin ' + getNeoLocation() +
-                       'ImagesUpload/octagon; rm -r ' + getNeoLocation() + 'ImagesUpload/octagon')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/usb_update.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/octagon; rm -r ' +
+            getNeoLocation() +
+            'ImagesUpload/octagon')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/octagon/sf8008m'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/octagon')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h5'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' + getNeoLocation() +
-                       'ImagesUpload/h5; mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' + getNeoLocation() + 'ImagesUpload/h5')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h5; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h5')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h7'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' + getNeoLocation() +
-                       'ImagesUpload/h7; mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' + getNeoLocation() + 'ImagesUpload/h7')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h7; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h7')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h7')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' + getNeoLocation() +
-                       'ImagesUpload/h9; mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' + getNeoLocation() + 'ImagesUpload/h9')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h9; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h9')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h9')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9se'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' + getNeoLocation() + 'ImagesUpload/h9se; mv ' +
-                       getNeoLocation() + 'ImagesUpload/fastboot.bin ' + getNeoLocation() + 'ImagesUpload/h9se')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h9se; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/h9se')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h9se')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/i55plus'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' + getNeoLocation() + 'ImagesUpload/i55plus; mv ' +
-                       getNeoLocation() + 'ImagesUpload/fastboot.bin ' + getNeoLocation() + 'ImagesUpload/i55plus')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/i55plus; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/i55plus')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/i55plus')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9combo'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/force_h9combo_READ.ME ' + getNeoLocation() + 'ImagesUpload/h9combo; mv ' +
-                       getNeoLocation() + 'ImagesUpload/unforce_h9combo.txt ' + getNeoLocation() + 'ImagesUpload/h9combo')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/force_h9combo_READ.ME ' +
+            getNeoLocation() +
+            'ImagesUpload/h9combo; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/unforce_h9combo.txt ' +
+            getNeoLocation() +
+            'ImagesUpload/h9combo')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h9combo')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9combose'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/force_h9combose_READ.ME ' + getNeoLocation() + 'ImagesUpload/h9combo; mv ' +
-                       getNeoLocation() + 'ImagesUpload/unforce_h9combose.txt ' + getNeoLocation() + 'ImagesUpload/h9combose')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/force_h9combose_READ.ME ' +
+            getNeoLocation() +
+            'ImagesUpload/h9combo; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/unforce_h9combose.txt ' +
+            getNeoLocation() +
+            'ImagesUpload/h9combose')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h9combose')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h10'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/force_h10_READ.ME ' + getNeoLocation() +
-                       'ImagesUpload/h10; mv ' + getNeoLocation() + 'ImagesUpload/unforce_h10.txt ' + getNeoLocation() + 'ImagesUpload/h10')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/force_h10_READ.ME ' +
+            getNeoLocation() +
+            'ImagesUpload/h10; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/unforce_h10.txt ' +
+            getNeoLocation() +
+            'ImagesUpload/h10')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h10')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h11'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/force_h11_READ.ME ' + getNeoLocation() +
-                       'ImagesUpload/h11; mv ' + getNeoLocation() + 'ImagesUpload/unforce_h11.txt ' + getNeoLocation() + 'ImagesUpload/h11')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/force_h11_READ.ME ' +
+            getNeoLocation() +
+            'ImagesUpload/h11; mv ' +
+            getNeoLocation() +
+            'ImagesUpload/unforce_h11.txt ' +
+            getNeoLocation() +
+            'ImagesUpload/h11')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h11')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h8'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/h8')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/uclan'):
-        if os.path.exists('' + getNeoLocation() + 'ImagesUpload/usb_update.bin'):
-            rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/usb_update.bin ' +
-                           getNeoLocation() + 'ImagesUpload/uclan')
+        if os.path.exists(
+            '' +
+            getNeoLocation() +
+                'ImagesUpload/usb_update.bin'):
+            rc = os.system(
+                'mv ' +
+                getNeoLocation() +
+                'ImagesUpload/usb_update.bin ' +
+                getNeoLocation() +
+                'ImagesUpload/uclan')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/uclan')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/ustym4kpro'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/ustym4kpro')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/beyonwiz'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/apploader.bin ' +
-                       getNeoLocation() + 'ImagesUpload/beyonwiz')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' +
-                       getNeoLocation() + 'ImagesUpload/beyonwiz')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' +
-                       getNeoLocation() + 'ImagesUpload/beyonwiz')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/apploader.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/beyonwiz')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/beyonwiz')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/beyonwiz')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/beyonwiz')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/amiko'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/usb_update.bin ' +
-                       getNeoLocation() + 'ImagesUpload/amiko')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/apploader.bin ' +
-                       getNeoLocation() + 'ImagesUpload/amiko')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' +
-                       getNeoLocation() + 'ImagesUpload/amiko')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' +
-                       getNeoLocation() + 'ImagesUpload/amiko')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/usb_update.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/amiko')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/apploader.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/amiko')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/amiko')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/amiko')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/amiko')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue/x1') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue/x34k'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/gigablue')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue') and os.path.exists('' + getNeoLocation() + 'ImagesUpload/usb_update.bin'):
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/usb_update.bin ' +
-                       getNeoLocation() + 'ImagesUpload/gigablue')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/apploader.bin ' +
-                       getNeoLocation() + 'ImagesUpload/gigablue')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/bootargs.bin ' +
-                       getNeoLocation() + 'ImagesUpload/gigablue')
-        rc = os.system('mv ' + getNeoLocation() + 'ImagesUpload/fastboot.bin ' +
-                       getNeoLocation() + 'ImagesUpload/gigablue')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/usb_update.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/gigablue')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/apploader.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/gigablue')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/bootargs.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/gigablue')
+        rc = os.system(
+            'mv ' +
+            getNeoLocation() +
+            'ImagesUpload/fastboot.bin ' +
+            getNeoLocation() +
+            'ImagesUpload/gigablue')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/gigablue')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/et10000'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/et10000')
@@ -1019,14 +1305,28 @@ def RemoveUnpackDirs():
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/vs1500'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/vs1500')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/pulse4k'):
-        if os.path.exists('' + getNeoLocation() + 'ImagesUpload/pulse4k/force_pulse4k_READ.ME'):
-            rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/pulse4k/force_pulse4k_READ.ME; rm -r ' +
-                           getNeoLocation() + 'ImagesUpload/pulse4k/unforce_pulse4k.txt')
+        if os.path.exists(
+            '' +
+            getNeoLocation() +
+                'ImagesUpload/pulse4k/force_pulse4k_READ.ME'):
+            rc = os.system(
+                'rm -r ' +
+                getNeoLocation() +
+                'ImagesUpload/pulse4k/force_pulse4k_READ.ME; rm -r ' +
+                getNeoLocation() +
+                'ImagesUpload/pulse4k/unforce_pulse4k.txt')
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/pulse4k')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/pulse4kmin'):
-        if os.path.exists('' + getNeoLocation() + 'ImagesUpload/pulse4kmin/force_pulse4kmini_READ.ME'):
-            rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/pulse4kmini/force_pulse4kmini_READ.ME; rm -r ' +
-                           getNeoLocation() + 'ImagesUpload/pulse4kmini/unforce_pulse4kmini.txt')
+        if os.path.exists(
+            '' +
+            getNeoLocation() +
+                'ImagesUpload/pulse4kmin/force_pulse4kmini_READ.ME'):
+            rc = os.system(
+                'rm -r ' +
+                getNeoLocation() +
+                'ImagesUpload/pulse4kmini/force_pulse4kmini_READ.ME; rm -r ' +
+                getNeoLocation() +
+                'ImagesUpload/pulse4kmini/unforce_pulse4kmini.txt')
         rc = os.system('rm -r ' + getNeoLocation() +
                        'ImagesUpload/pulse4kmini')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/xpeedlx'):
@@ -1044,7 +1344,10 @@ def RemoveUnpackDirs():
                        'ImagesUpload/rootfs.tar.bz2')
     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/rootfs.tar'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/rootfs.tar')
-    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/unforce_h9combo.txt'):
+    if os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImagesUpload/unforce_h9combo.txt'):
         rc = os.system('rm -r ' + getNeoLocation() +
                        'ImagesUpload/unforce_h9combo.txt')
     if os.path.exists('' + getNeoLocation() + 'ImagesUpload/imageversion'):
@@ -1053,7 +1356,10 @@ def RemoveUnpackDirs():
     if os.path.exists('' + getNeoLocation() + 'ImagesUpload/kernel.bin'):
         rc = os.system('rm -rf ' + getNeoLocation() +
                        'ImagesUpload/kernel.bin')
-    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/force_multibox_READ.ME'):
+    if os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImagesUpload/force_multibox_READ.ME'):
         rc = os.system('rm -r ' + getNeoLocation() +
                        'ImagesUpload/force_multibox_READ.ME')
     if os.path.exists('' + getNeoLocation() + 'ImagesUpload/force'):
@@ -1064,10 +1370,16 @@ def RemoveUnpackDirs():
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/splash.bin')
     if os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue'):
         rc = os.system('rm -r ' + getNeoLocation() + 'ImagesUpload/gigablue')
-    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/update_bootargs_h8'):
+    if os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImagesUpload/update_bootargs_h8'):
         rc = os.system('rm -r ' + getNeoLocation() +
                        'ImagesUpload/update_bootargs_h8')
-    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/force_hd60_READ.ME'):
+    if os.path.exists(
+        '' +
+        getNeoLocation() +
+            'ImagesUpload/force_hd60_READ.ME'):
         rc = os.system('rm -r ' + getNeoLocation() +
                        'ImagesUpload/force_hd60_READ.ME')
     if os.path.exists('' + getNeoLocation() + 'ImagesUpload/unforce_hd60.txt'):
@@ -1109,14 +1421,20 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
             cmd = 'touch /tmp/root_jffs2; ' + extensions_path + 'NeoBoot/bin/nfidump ' + \
                 sourcefile2 + ' ' + getNeoLocation() + 'ImageBoot/' + target
             rc = os.system(cmd)
-            if os.path.exists('%sImageBoot/%s/media/squashfs-images' % (media, target)) and os.path.exists('%s/squashfs-images' % (media)):
+            if os.path.exists(
+                    '%sImageBoot/%s/media/squashfs-images' %
+                    (media, target)) and os.path.exists(
+                    '%s/squashfs-images' %
+                    (media)):
                 os.system(
-                    'cp -af %s/squashfs-images/* "%sImageBoot/%s/media/squashfs-images' % (media, media, target))
+                    'cp -af %s/squashfs-images/* "%sImageBoot/%s/media/squashfs-images' %
+                    (media, media, target))
             if ZipDelete == 'True':
                 rc = os.system('rm -rf ' + sourcefile2)
             else:
                 os.system(
-                    'echo "NeoBoot keep the file:  %s  for reinstallation."' % sourcefile2)
+                    'echo "NeoBoot keep the file:  %s  for reinstallation."' %
+                    sourcefile2)
     # Instalacja *.rar
     if os.path.exists(sourcefile3) is True:
         if sourcefile3.endswith('.rar'):
@@ -1128,7 +1446,8 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 rc = os.system('rm -rf ' + sourcefile3)
             else:
                 os.system(
-                    'echo "NeoBoot keep the file:  %s  for reinstallation."' % sourcefile3)
+                    'echo "NeoBoot keep the file:  %s  for reinstallation."' %
+                    sourcefile3)
 
     # Instalacja *.zip
     elif os.path.exists(sourcefile) is True:
@@ -1153,7 +1472,8 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
             os.system('touch /tmp/other_image')
 
     # Instalacja MIPS
-    if getCPUtype() == 'MIPS' and not os.path.exists('/tmp/root_jffs2') and not os.path.exists('/tmp/other_image'):
+    if getCPUtype() == 'MIPS' and not os.path.exists(
+            '/tmp/root_jffs2') and not os.path.exists('/tmp/other_image'):
         if os.path.exists('' + getNeoLocation() + 'ubi') is False:
             rc = os.system('mkdir ' + getNeoLocation() + 'ubi')
         to = '' + getNeoLocation() + 'ImageBoot/' + target
@@ -1165,7 +1485,8 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
         brand = ''
 
         # NANDSIM
-        if Nandsim == 'True' or os.path.exists('/tmp/.isnandsim') or os.path.exists('/lib/modules/%s/kernel/drivers/mtd/nand/nandsim.ko' % getKernelVersion()):
+        if Nandsim == 'True' or os.path.exists('/tmp/.isnandsim') or os.path.exists(
+                '/lib/modules/%s/kernel/drivers/mtd/nand/nandsim.ko' % getKernelVersion()):
             for i in range(0, 20):
                 mtdfile = '/dev/mtd' + str(i)
                 if os.path.exists(mtdfile) is False:
@@ -1178,52 +1499,88 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('zgemma')
                 brand = 'zgemma'
                 rootfname = 'rootfs.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/sh1'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/sh1'):
                     os.chdir('sh1')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/sh2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/sh2'):
                     os.chdir('sh2')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h2'):
                     os.chdir('h2')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h3'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h3'):
                     os.chdir('h3')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h5'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h5'):
                     os.chdir('h5')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h7'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h7'):
                     os.chdir('h7')
 
             # miraclebox
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/miraclebox'):
                 os.chdir('miraclebox')
                 brand = 'miraclebox'
                 rootfname = 'rootfs.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/mini'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/mini'):
                     os.chdir('mini')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/miniplus'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/miniplus'):
                     os.chdir('miniplus')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/minihybrid'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/minihybrid'):
                     os.chdir('minihybrid')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/twin'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/twin'):
                     os.chdir('twin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/ultra'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/ultra'):
                     os.chdir('ultra')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/micro'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/micro'):
                     os.chdir('micro')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/twinplus'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/twinplus'):
                     os.chdir('twinplus')
             # atemio
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio'):
                 os.chdir('atemio')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/5x00'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/5x00'):
                     os.chdir('5x00')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6000'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6000'):
                     os.chdir('6000')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6100'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6100'):
                     os.chdir('6100')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6200'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6200'):
                     os.chdir('6200')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
                     os.chdir('8x00')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
                     os.chdir('8x00')
             # Xtrend
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/et10000'):
@@ -1251,16 +1608,28 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('et4x00')
                 brand = 'et4x00'
             # formuler
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler1'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler1'):
                 os.chdir('formuler1')
                 brand = 'formuler1'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler2'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler2'):
                 os.chdir('formuler2')
                 brand = 'formuler2'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler3'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler3'):
                 os.chdir('formuler3')
                 brand = 'formuler3'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler4turbo'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler4turbo'):
                 os.chdir('formuler4turbo')
                 brand = 'formuler4turbo'
             #   Golden Interstar
@@ -1275,31 +1644,44 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('gigablue')
                 brand = 'gigablue'
                 rootfname = 'rootfs.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue/x1'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/gigablue/x1'):
                     os.chdir('x1')
             # VuPlus
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus'):
                 os.chdir('vuplus')
                 brand = 'vuplus'
                 rootfname = 'root_cfe_auto.jffs2'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/uno'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/uno'):
                     os.chdir('uno')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/duo'):
                     os.chdir('duo')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/ultimo'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/ultimo'):
                     os.chdir('ultimo')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solo'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/solo'):
                     os.chdir('solo')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/duo2'):
                     os.chdir('duo2')
                     rootfname = 'root_cfe_auto.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solo2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/solo2'):
                     os.chdir('solo2')
                     rootfname = 'root_cfe_auto.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solose'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/solose'):
                     os.chdir('solose')
                     rootfname = 'root_cfe_auto.bin'
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/zero'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/zero'):
                     os.chdir('zero')
                     rootfname = 'root_cfe_auto.bin'
 
@@ -1308,7 +1690,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('osmini')
                 brand = 'osmini'
                 rootfname = 'rootfs.bin'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osminiplus'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osminiplus'):
                 os.chdir('osminiplus')
                 brand = 'osmini'
                 rootfname = 'rootfs.bin'
@@ -1320,11 +1705,17 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('osnino')
                 brand = 'osnino'
                 rootfname = 'rootfs.bin'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osninoplus'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osninoplus'):
                 os.chdir('osninoplus')
                 brand = 'osnino'
                 rootfname = 'rootfs.bin'
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osninopro'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osninopro'):
                 os.chdir('osninopro')
                 brand = 'osnino'
                 rootfname = 'rootfs.bin'
@@ -1341,7 +1732,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 brand = 'xp1000'
 
             # Dreambox
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/dm520') and not os.path.exists('/tmp/dm_image'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/dm520') and not os.path.exists('/tmp/dm_image'):
                 os.system('touch /tmp/dm_image')
                 os.chdir('dm520')
                 brand = 'dm520'
@@ -1351,8 +1745,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
             os.system('echo "Instalacja - nandsim w toku..."')
             os.system(
                 'echo "If the image installation failed, try disabling the use of nandsim installation"')
-            # rc = os.system('insmod /lib/modules/' + getKernelVersion() + '/kernel/drivers/mtd/nand/nandsim.ko cache_file=' + getNeoLocation() + 'image_cache first_id_byte=0x20 second_id_byte=0xaa third_id_byte=0x00 fourth_id_byte=0x15;sleep 5')#% getKernelVersion())
-            if not os.path.exists('/lib/modules/%s/kernel/drivers/mtd/nand/nandsim.ko' % getKernelVersion()):
+            # rc = os.system('insmod /lib/modules/' + getKernelVersion() +
+            # '/kernel/drivers/mtd/nand/nandsim.ko cache_file=' +
+            # getNeoLocation() + 'image_cache first_id_byte=0x20
+            # second_id_byte=0xaa third_id_byte=0x00 fourth_id_byte=0x15;sleep
+            # 5')#% getKernelVersion())
+            if not os.path.exists(
+                '/lib/modules/%s/kernel/drivers/mtd/nand/nandsim.ko' %
+                    getKernelVersion()):
                 rc = os.system('insmod /tmp/nandsim.ko cache_file=' + getNeoLocation() +
                                # % getKernelVersion())
                                'image_cache first_id_byte=0x20 second_id_byte=0xaa third_id_byte=0x00 fourth_id_byte=0x15;sleep 5')
@@ -1374,10 +1774,12 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
             rc = os.system(cmd)
             rc = os.system('rmmod nandsim')
             rc = os.system('rm ' + getNeoLocation() + 'image_cache')
-            if os.path.exists('/tmp/dm_image') and os.path.exists('%s/ImageBoot/%s/etc/issue' % (media, target)):
+            if os.path.exists(
+                    '/tmp/dm_image') and os.path.exists('%s/ImageBoot/%s/etc/issue' % (media, target)):
                 os.system('rm -f /tmp/dm_image')
 
-            if '.tar.xz' not in source and not os.path.exists('%s/ImageBoot/%s/etc/issue' % (media, target)):
+            if '.tar.xz' not in source and not os.path.exists(
+                    '%s/ImageBoot/%s/etc/issue' % (media, target)):
                 RemoveUnpackDirs()
                 os.system("echo 3 > /proc/sys/vm/drop_caches")
                 os.system(
@@ -1392,7 +1794,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
 
         # UBI_READER
         elif os.path.exists('' + extensions_path + 'NeoBoot/ubi_reader/ubi_extract_files.py') and not os.path.exists('/tmp/root_jffs2'):
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/venton-hdx'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/venton-hdx'):
                 os.chdir('venton-hdx')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/hde'):
                 os.chdir('hde')
@@ -1400,39 +1805,77 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('hdx')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/hdp'):
                 os.chdir('hdp')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/miraclebox'):
                 os.chdir('miraclebox')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/mini'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/mini'):
                     os.chdir('mini')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/miniplus'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/miniplus'):
                     os.chdir('miniplus')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/minihybrid'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/minihybrid'):
                     os.chdir('minihybrid')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/twin'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/twin'):
                     os.chdir('twin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/ultra'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/ultra'):
                     os.chdir('ultra')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/micro'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/micro'):
                     os.chdir('micro')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/microv2'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/microv2'):
                     os.chdir('microv2')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/twinplus'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/twinplus'):
                     os.chdir('twinplus')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/mini4k'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/mini4k'):
                     os.chdir('mini4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/miraclebox/ultra4k'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/miraclebox/ultra4k'):
                     os.chdir('ultra4k')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio'):
                 os.chdir('atemio')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/5x00'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/5x00'):
                     os.chdir('5x00')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6000'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6000'):
                     os.chdir('6000')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6100'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6100'):
                     os.chdir('6100')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/6200'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/6200'):
                     os.chdir('6200')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/atemio/8x00'):
                     os.chdir('8x00')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/xpeedlx'):
                 os.chdir('xpeedlx')
@@ -1444,55 +1887,92 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('bwidowx2')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/beyonwiz'):
                 os.chdir('beyonwiz')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/beyonwiz/hdx'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/beyonwiz/hdx'):
                     os.chdir('hdx')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/beyonwiz/hdp'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/beyonwiz/hdp'):
                     os.chdir('hdp')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/beyonwiz/hde2'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/beyonwiz/hde2'):
                     os.chdir('hde2')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus'):
                 os.chdir('vuplus')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/duo'):
                     os.chdir('duo')
                     os.system('mv root_cfe_auto.jffs2 rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solo'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/solo'):
                     os.chdir('solo')
                     os.system('mv -f root_cfe_auto.jffs2 rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solose'):
-                    if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solose/root_cfe_auto.bin'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/solose'):
+                    if os.path.exists(
+                        '' +
+                        getNeoLocation() +
+                            'ImagesUpload/vuplus/solose/root_cfe_auto.bin'):
                         os.chdir('solose')
                         os.system('mv -f root_cfe_auto.bin rootfs.bin')
                     elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solose/root_cfe_auto.jffs2'):
                         os.chdir('solose')
                         os.system('mv -f root_cfe_auto.jffs2 rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/ultimo'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/ultimo'):
                     os.chdir('ultimo')
                     os.system('mv -f root_cfe_auto.jffs2 rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/uno'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/uno'):
                     os.chdir('uno')
                     os.system('mv -f root_cfe_auto.jffs2 rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solo2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/solo2'):
                     os.chdir('solo2')
                     os.system('mv -f root_cfe_auto.bin rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo2'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/duo2'):
                     os.chdir('duo2')
                     os.system('mv -f root_cfe_auto.bin rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/zero'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/zero'):
                     os.chdir('zero')
                     os.system('mv -f root_cfe_auto.bin rootfs.bin')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/solo4k'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/solo4k'):
                     os.chdir('solo4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/uno4k'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/uno4k'):
                     os.chdir('uno4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/ultimo4k'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/ultimo4k'):
                     os.chdir('ultimo4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo4k'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/vuplus/duo4k'):
                     os.chdir('duo4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/duo4kse'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/duo4kse'):
                     os.chdir('duo4kse')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/zero4k'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/zero4k'):
                     os.chdir('zero4k')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/uno4kse'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/vuplus/uno4kse'):
                     os.chdir('uno4kse')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/et10000'):
                 os.chdir('et10000')
@@ -1528,13 +2008,20 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('sf3038')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/sf4008'):
                 os.chdir('sf4008')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/octagon/sf8008'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/octagon/sf8008'):
                 os.chdir('sf8008')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue'):
                 os.chdir('gigablue')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue/quad'):
+                if os.path.exists(
+                    '' +
+                    getNeoLocation() +
+                        'ImagesUpload/gigablue/quad'):
                     os.chdir('quad')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/gigablue/x1'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/gigablue/x1'):
                     os.chdir('x1')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/hd2400'):
                 os.chdir('hd2400')
@@ -1542,38 +2029,62 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 os.chdir('hd51')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma'):
                 os.chdir('zgemma')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h3'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h3'):
                     os.chdir('h3')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h5'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h5'):
                     os.chdir('h5')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/zgemma/h7'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/zgemma/h7'):
                     os.chdir('h7')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/dm900'):
                 os.chdir('dm900')
             # os_Edision
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osmini'):
                 os.chdir('osmini')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osminiplus'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osminiplus'):
                 os.chdir('osminiplus')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osmega'):
                 os.chdir('osmega')
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osnino'):
                 os.chdir('osnino')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osninoplus'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osninoplus'):
                 os.chdir('osninoplus')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/osninopro'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/osninopro'):
                 os.chdir('osninopro')
             # xp1000
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/xp1000'):
                 os.chdir('xp1000')
 
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler1'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler1'):
                 os.chdir('formuler1')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler2'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler2'):
                 os.chdir('formuler2')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler3'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler3'):
                 os.chdir('formuler3')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/formuler4turbo'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/formuler4turbo'):
                 os.chdir('formuler4turbo')
             # AZBOX - Install image VUULTIMO MIPS It works
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/patch.e2'):
@@ -1593,7 +2104,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
 
             # Instalacja image ubi_reader
             os.system('echo "Instalacja - ubi_reader w toku..."')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/vuplus/root_cfe_auto.*'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/vuplus/root_cfe_auto.*'):
                 os.system('mv -f root_cfe_auto.* rootfs.bin')
             cmd = 'chmod 777 ' + extensions_path + 'NeoBoot/ubi_reader/ubi_extract_files.py'
             rc = os.system(cmd)
@@ -1618,14 +2132,27 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
 # ARM
     elif getCPUtype() == 'ARMv7':
         os.chdir('' + getNeoLocation() + 'ImagesUpload')
-        if os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9/rootfs.ubi') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/h8/rootfs.ubi') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/e2/update/rootfs.ubi'):
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9/rootfs.ubi'):
+        if os.path.exists('' +
+                          getNeoLocation() +
+                          'ImagesUpload/h9/rootfs.ubi') or os.path.exists('' +
+                                                                          getNeoLocation() +
+                                                                          'ImagesUpload/h8/rootfs.ubi') or os.path.exists('' +
+                                                                                                                          getNeoLocation() +
+                                                                                                                          'ImagesUpload/e2/update/rootfs.ubi'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/h9/rootfs.ubi'):
                 os.chdir('h9')
             elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h8/rootfs.ubi'):
                 os.chdir('h8')
             elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/e2/update/rootfs.ubi'):
-                os.system('mv -f ' + getNeoLocation() +
-                          'ImagesUpload/e2/update/rootfs.ubi ' + getNeoLocation() + 'ImagesUpload/e2')
+                os.system(
+                    'mv -f ' +
+                    getNeoLocation() +
+                    'ImagesUpload/e2/update/rootfs.ubi ' +
+                    getNeoLocation() +
+                    'ImagesUpload/e2')
                 os.chdir('e2')
             os.system('mv -f rootfs.ubi rootfs.bin')
             os.system('echo "Instalacja - ubi_reader w toku..."')
@@ -1648,7 +2175,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
 
         elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/axas/axashistwin'):
             os.chdir('axas')
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/axas/axashistwin'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/axas/axashistwin'):
                 os.chdir('axashistwin')
                 os.system('echo "Instalacja - ubi_reader w toku..."')
                 print(
@@ -1691,8 +2221,12 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
 
         elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/update/lunix/cfe/oe_rootfs.bin'):
             os.chdir('update')
-            os.system('mv -f ' + getNeoLocation() + 'ImagesUpload/update/lunix/cfe/oe_rootfs.bin ' +
-                      getNeoLocation() + 'ImagesUpload/update/rootfs.bin')
+            os.system(
+                'mv -f ' +
+                getNeoLocation() +
+                'ImagesUpload/update/lunix/cfe/oe_rootfs.bin ' +
+                getNeoLocation() +
+                'ImagesUpload/update/rootfs.bin')
             os.system('echo "Instalacja - ubi_reader w toku..."')
             print(
                 "[NeoBoot] Extracting UBIFS image and moving extracted image to our target")
@@ -1898,7 +2432,10 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 target + ' > /dev/null 2>&1'
             rc = os.system(cmd)
         elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9/rootfs.ubi') or os.path.exists('' + getNeoLocation() + 'ImagesUpload/h8/rootfs.ubi'):
-            if os.path.exists('' + getNeoLocation() + 'ImagesUpload/h9/rootfs.ubi'):
+            if os.path.exists(
+                '' +
+                getNeoLocation() +
+                    'ImagesUpload/h9/rootfs.ubi'):
                 os.chdir('h9')
             elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/h8/rootfs.ubi'):
                 os.chdir('h8')
@@ -2030,7 +2567,8 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
         elif os.path.exists('' + getNeoLocation() + 'ImagesUpload/dinobot/u55'):
             if os.path.exists('' + getNeoLocation() + 'ImagesUpload/dinobot'):
                 os.chdir('dinobot')
-                if os.path.exists('' + getNeoLocation() + 'ImagesUpload/dinobot/u55'):
+                if os.path.exists(
+                        '' + getNeoLocation() + 'ImagesUpload/dinobot/u55'):
                     os.chdir('u55')
                     os.system('echo "Instalacja - ubi_reader w toku..."')
                     os.system('echo "[NeoBoot] Extracting image HITUBE4k"')
@@ -2197,8 +2735,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                     os.system('touch /tmp/xz-gz-tar')
                     os.system(
                         'echo "Installing the file .tar.xz in progress..."')
-                    os.system('mv ' + getNeoLocation() + 'ImagesUpload/' + source +
-                              '.tar.xz  ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.xz')
+                    os.system(
+                        'mv ' +
+                        getNeoLocation() +
+                        'ImagesUpload/' +
+                        source +
+                        '.tar.xz  ' +
+                        getNeoLocation() +
+                        'ImagesUpload/rootfs.tar.xz')
                     cmd = 'chmod 777 ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.xz; tar -xf ' + getNeoLocation() + \
                         'ImagesUpload/rootfs.tar.xz -C ' + getNeoLocation() + 'ImageBoot/' + \
                         target + ' > /dev/null 2>&1'
@@ -2211,8 +2755,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                     os.system('touch /tmp/xz-gz-tar')
                     os.system(
                         'echo "Installing the file tar.gz in progress..."')
-                    os.system('mv ' + getNeoLocation() + 'ImagesUpload/' + source +
-                              '.tar.gz  ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.gz')
+                    os.system(
+                        'mv ' +
+                        getNeoLocation() +
+                        'ImagesUpload/' +
+                        source +
+                        '.tar.gz  ' +
+                        getNeoLocation() +
+                        'ImagesUpload/rootfs.tar.gz')
                     cmd = 'chmod 777 ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.gz; /bin/tar -xzvf ' + getNeoLocation() + \
                         'ImagesUpload/rootfs.tar.gz -C ' + getNeoLocation() + 'ImageBoot/' + \
                         target + ' > /dev/null 2>&1'
@@ -2224,8 +2774,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 if not os.path.exists('/tmp/xz-gz-tar'):
                     os.system('touch /tmp/xz-gz-tar')
                     os.system('echo "Installing the file tar in progress..."')
-                    os.system('mv ' + getNeoLocation() + 'ImagesUpload/' +
-                              source + ' ' + getNeoLocation() + 'ImagesUpload/rootfs.tar')
+                    os.system(
+                        'mv ' +
+                        getNeoLocation() +
+                        'ImagesUpload/' +
+                        source +
+                        ' ' +
+                        getNeoLocation() +
+                        'ImagesUpload/rootfs.tar')
                     cmd = '/bin/tar -xvf ' + getNeoLocation() + 'ImagesUpload/rootfs.tar -C ' + \
                         getNeoLocation() + 'ImageBoot/' + target + ' > /dev/null 2>&1'
                     rc = os.system(cmd)
@@ -2237,8 +2793,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                     os.system('touch /tmp/xz-gz-tar')
                     os.system(
                         'echo "Installing the file .tar.bz2 in progress..."')
-                    os.system('mv ' + getNeoLocation() + 'ImagesUpload/' + source +
-                              '.tar.bz2  ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.bz2')
+                    os.system(
+                        'mv ' +
+                        getNeoLocation() +
+                        'ImagesUpload/' +
+                        source +
+                        '.tar.bz2  ' +
+                        getNeoLocation() +
+                        'ImagesUpload/rootfs.tar.bz2')
                     cmd = 'chmod 777 ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.bz2; tar -jxf ' + getNeoLocation() + \
                         'ImagesUpload/rootfs.tar.bz2 -C ' + getNeoLocation() + 'ImageBoot/' + \
                         target + ' > /dev/null 2>&1'
@@ -2249,8 +2811,14 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
             elif fn.find('.mb') != -1:
                 os.system(
                     'echo "Please wait. System installation spakowanego w plik .mb w toku..."')
-                os.system('cp -af ' + getNeoLocation() + 'ImagesUpload/' + source +
-                          '.mb  ' + getNeoLocation() + 'ImagesUpload/rootfs.tar.gz')
+                os.system(
+                    'cp -af ' +
+                    getNeoLocation() +
+                    'ImagesUpload/' +
+                    source +
+                    '.mb  ' +
+                    getNeoLocation() +
+                    'ImagesUpload/rootfs.tar.gz')
                 cmd = 'chmod 777 ' + getNeoLocation() + 'ImagesUpload/*.tar.gz; tar -xzvf ' + getNeoLocation() + \
                     'ImagesUpload/*.tar.gz -C ' + getNeoLocation() + 'ImageBoot/' + \
                     target + ' > /dev/null 2>&1'
@@ -2281,16 +2849,22 @@ def NEOBootExtract(source, target, ZipDelete, Nandsim):
                 if not os.path.exists('/tmp/xz-gz-tar'):
                     os.system('touch /tmp/xz-gz-tar')
                     os.system('echo "Installing the file .gz in progress..."')
-                    os.system('mv ' + getNeoLocation() + 'ImagesUpload/' + source +
-                              '.gz  ' + getNeoLocation() + 'ImagesUpload/rootfs.gz')
+                    os.system(
+                        'mv ' +
+                        getNeoLocation() +
+                        'ImagesUpload/' +
+                        source +
+                        '.gz  ' +
+                        getNeoLocation() +
+                        'ImagesUpload/rootfs.gz')
                     cmd = 'chmod 777 ' + getNeoLocation() + 'ImagesUpload/rootfs.gz; /bin/tar -xvf ' + getNeoLocation() + \
                         'ImagesUpload/rootfs.gz -C ' + getNeoLocation() + 'ImageBoot/' + \
                         target + ' > /dev/null 2>&1'
                     rc = os.system(cmd)
                     rc = os.system('rm -r ' + getNeoLocation() +
                                    '/ImagesUpload/rootfs.gz')
-                    cmd = 'rm -rf ' + getNeoLocation() + 'ImagesUpload/' + sourcefile4 + \
-                        ' '  ' > /dev/null 2>&1'
+                    cmd = 'rm -rf ' + getNeoLocation() + 'ImagesUpload/' + \
+                        sourcefile4 + ' ' ' > /dev/null 2>&1'
                     rc = os.system(cmd)
                     cmd = 'rm -f ' + getNeoLocation() + 'ImagesUpload/*.jpg '  ' > /dev/null 2>&1'
                     rc = os.system(cmd)

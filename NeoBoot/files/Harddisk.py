@@ -14,7 +14,7 @@ else:
     from Components import Task
 try:
     from Plugins.Extensions.NeoBoot.files.Task import LoggingTask
-except:
+except BaseException:
     from Components.Task import LoggingTask
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
@@ -46,7 +46,8 @@ def getProcMounts():
 
 
 def getNonNetworkMediaMounts():
-    return [x[1] for x in getProcMounts() if x[1].startswith('/media/') and not x[0].startswith('//')]
+    return [x[1] for x in getProcMounts() if x[1].startswith('/media/')
+            and not x[0].startswith('//')]
 
 
 def isFileSystemSupported(filesystem):
@@ -101,7 +102,7 @@ class Harddisk():
             data = open('/sys/block/%s/queue/rotational' %
                         device, 'r').read().strip()
             self.rotational = int(data)
-        except:
+        except BaseException:
             self.rotational = True
 
         if self.type == DEVTYPE_UDEV:
@@ -173,14 +174,14 @@ class Harddisk():
             line = readFile(self.sysfsPath('size'))
             cap = int(line)
             return cap / 1000 * 512 / 1000
-        except:
+        except BaseException:
             dev = self.findMount()
             if dev:
                 try:
                     stat = os.statvfs(dev)
                     cap = int(stat.f_blocks * stat.f_bsize)
                     return cap / 1000 / 1000
-                except:
+                except BaseException:
                     pass
 
         return cap
@@ -214,7 +215,7 @@ class Harddisk():
             try:
                 stat = os.statvfs(dev)
                 return stat.f_bfree / 1000 * (stat.f_bsize / 1024)
-            except:
+            except BaseException:
                 pass
 
         return -1
@@ -532,7 +533,12 @@ class Harddisk():
 
 class Partition():
 
-    def __init__(self, mountpoint, device=None, description='', force_mounted=False):
+    def __init__(
+            self,
+            mountpoint,
+            device=None,
+            description='',
+            force_mounted=False):
         self.mountpoint = mountpoint
         self.description = description
         self.force_mounted = mountpoint and force_mounted
@@ -540,7 +546,8 @@ class Partition():
         self.device = device
 
     def __str__(self):
-        return 'Partition(mountpoint=%s,description=%s,device=%s)' % (self.mountpoint, self.description, self.device)
+        return 'Partition(mountpoint=%s,description=%s,device=%s)' % (
+            self.mountpoint, self.description, self.device)
 
     def stat(self):
         if self.mountpoint:
@@ -566,7 +573,8 @@ class Partition():
         return None
 
     def tabbedDescription(self):
-        if self.mountpoint.startswith('/media/net') or self.mountpoint.startswith('/media/autofs'):
+        if self.mountpoint.startswith(
+                '/media/net') or self.mountpoint.startswith('/media/autofs'):
             return self.description
         return self.description + '\t' + self.mountpoint
 
@@ -588,7 +596,8 @@ class Partition():
             if mounts is None:
                 mounts = getProcMounts()
             for fields in mounts:
-                if self.mountpoint.endswith('/') and not self.mountpoint == '/':
+                if self.mountpoint.endswith(
+                        '/') and not self.mountpoint == '/':
                     if fields[1] + '/' == self.mountpoint:
                         return fields[2]
                 elif fields[1] == self.mountpoint:
@@ -733,8 +742,11 @@ class HarddiskManager():
             device)
         if not blacklisted and medium_found:
             description = self.getUserfriendlyDeviceName(device, physdev)
-            p = Partition(mountpoint=self.getMountpoint(
-                device), description=description, force_mounted=True, device=device)
+            p = Partition(
+                mountpoint=self.getMountpoint(device),
+                description=description,
+                force_mounted=True,
+                device=device)
             self.partitions.append(p)
             if p.mountpoint:
                 self.on_partition_list_change('add', p)
@@ -763,8 +775,11 @@ class HarddiskManager():
             device)
         if not blacklisted and medium_found:
             description = self.getUserfriendlyDeviceName(device, physdev)
-            p = Partition(mountpoint='/media/audiocd',
-                          description=description, force_mounted=True, device=device)
+            p = Partition(
+                mountpoint='/media/audiocd',
+                description=description,
+                force_mounted=True,
+                device=device)
             self.partitions.append(p)
             self.on_partition_list_change('add', p)
             SystemInfo['Harddisk'] = False
@@ -969,7 +984,7 @@ class MkfsTask(Task.LoggingTask):
         self.log.append(data)
 
 
-########################### __From HarddiskSetup_################################
+########################### __From HarddiskSetup_#########################
 class HarddiskSetup(Screen):
 
     def __init__(self, session, hdd, action, text, question):
@@ -982,10 +997,12 @@ class HarddiskSetup(Screen):
         self['bus'] = Label(_('Bus: ') + hdd.bus())
         self['key_red'] = Label(_('Cancel'))
         self['key_green'] = Label(text)
-        self['actions'] = ActionMap(['OkCancelActions'], {'ok': self.hddQuestion,
-                                                          'cancel': self.close})
-        self['shortcuts'] = ActionMap(['ShortcutActions'], {'red': self.close,
-                                                            'green': self.hddQuestion})
+        self['actions'] = ActionMap(
+            ['OkCancelActions'], {
+                'ok': self.hddQuestion, 'cancel': self.close})
+        self['shortcuts'] = ActionMap(
+            ['ShortcutActions'], {
+                'red': self.close, 'green': self.hddQuestion})
 
     def hddQuestion(self):
         message = self.question + '\n' + \
@@ -997,7 +1014,7 @@ class HarddiskSetup(Screen):
             return
         try:
             from .Task import job_manager
-        except:
+        except BaseException:
             from Components.Task import job_manager
         try:
             job = self.action()
@@ -1024,14 +1041,21 @@ class HarddiskSelection(Screen):
             self['hddlist'] = MenuList(harddiskmanager.HDDList())
         self['key_red'] = Label(_('Cancel'))
         self['key_green'] = Label(_('Select'))
-        self['actions'] = ActionMap(['OkCancelActions'], {'ok': self.okbuttonClick,
-                                                          'cancel': self.close})
-        self['shortcuts'] = ActionMap(['ShortcutActions'], {'red': self.close,
-                                                            'green': self.okbuttonClick})
+        self['actions'] = ActionMap(
+            ['OkCancelActions'], {
+                'ok': self.okbuttonClick, 'cancel': self.close})
+        self['shortcuts'] = ActionMap(
+            ['ShortcutActions'], {
+                'red': self.close, 'green': self.okbuttonClick})
 
     def doIt(self, selection):
-        self.session.openWithCallback(self.close, HarddiskSetup, selection, action=selection.createInitializeJob, text=_(
-            'Initialize'), question=_('Do you really want to initialize the device?\nAll data on the disk will be lost!'))
+        self.session.openWithCallback(
+            self.close,
+            HarddiskSetup,
+            selection,
+            action=selection.createInitializeJob,
+            text=_('Initialize'),
+            question=_('Do you really want to initialize the device?\nAll data on the disk will be lost!'))
 
     def okbuttonClick(self):
         selection = self['hddlist'].getCurrent()
@@ -1042,9 +1066,14 @@ class HarddiskSelection(Screen):
 class HarddiskFsckSelection(HarddiskSelection):
 
     def doIt(self, selection):
-        self.session.openWithCallback(self.close, HarddiskSetup, selection, action=selection.createCheckJob, text=_(
-            'Check'), question=_('Do you really want to check the filesystem?\nThis could take lots of time!'))
-########################### __end HarddiskSetup_################################
+        self.session.openWithCallback(
+            self.close,
+            HarddiskSetup,
+            selection,
+            action=selection.createCheckJob,
+            text=_('Check'),
+            question=_('Do you really want to check the filesystem?\nThis could take lots of time!'))
+########################### __end HarddiskSetup_##########################
 
 
 harddiskmanager = HarddiskManager()

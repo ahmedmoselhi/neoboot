@@ -13,7 +13,8 @@ def ubi(ubi, tab=''):
     print(('\t%sLayout Block Count: %s' % (tab, len(ubi.layout_blocks_list))))
     print(('\t%sInternal Volume Block Count: %s' %
           (tab, len(ubi.int_vol_blocks_list))))
-    print(('\t%sUnknown Block Count: %s' % (tab, len(ubi.unknown_blocks_list))))
+    print(('\t%sUnknown Block Count: %s' %
+          (tab, len(ubi.unknown_blocks_list))))
     print(('\t%sFirst UBI PEB Number: %s' % (tab, ubi.first_peb_num)))
 
 
