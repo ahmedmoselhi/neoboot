@@ -1,0 +1,62 @@
+deploy:
+    needs: test-language
+    if: github.event_name == 'push' && !contains(github.event.head_commit.message,'skip-release') && github.repository == 'ahmedmoselhi/neoboot' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3
+        run: |
+          sudo apt install -y python3
+      - name: Install dependencies
+        run: |
+          sudo apt-get install gettext
+      - name: Build sources
+        run: |
+          python setup.py build --build-lib=build/lib
+      
+      - name: 🔍 Read version from ver.txt
+        id: read_version
+        run: |
+          echo "pkgver=$(cat ver.txt)" >> $GITHUB_OUTPUT
+          
+      - name: ⚙️ Set git and package variables
+        env:
+          VER_FROM_FILE: ${{ steps.read_version.outputs.pkgver }}
+        run: |
+          echo "SRCPV=${{ env.VER_FROM_FILE }}" >> $GITHUB_ENV 
+          echo "PKGV=${{ env.VER_FROM_FILE }}-${GITHUB_SHA::7}" >> $GITHUB_ENV 
+          echo "COMMIT_SUBJECT=$(git log -1 --pretty=format:%s)" >> $GITHUB_ENV
+          
+      - name: Create plugin package files
+        run: |
+          mkdir -p deploy/data/usr/lib/enigma2/python/Plugins
+          cp -r build/lib/* deploy/data/usr/lib/enigma2/python/Plugins
+          sed -i 's/Version:/Version: ${{ env.PKGV }}/' deploy/control/control
+          mkdir ipk
+      - name: Compile python sources
+        run: |
+          python -O -m compileall deploy/data/usr/lib/enigma2/python/Plugins/Extensions/NeoBoot/
+      - name: Build python data package
+        working-directory: './deploy/data'
+        run: |
+          tar --numeric-owner --group=0 --owner=0 -czf ../data.tar.gz ./*
+      - name: Build python control package
+        working-directory: './deploy/control'
+        run: |
+          tar --numeric-owner --group=0 --owner=0 -czf ../control.tar.gz ./*
+      - name: Build python ipk package
+        working-directory: './deploy'
+        run: |
+          echo 2.0 > debian-binary
+          ar rv ../ipk/enigma2-plugin-extensions-neoboot_${{ env.PKGV }}_all.ipk debian-binary data.tar.gz control.tar.gz
+      - name: Create release
+        uses: Taapat/github-release@v2.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.SRCPV }}
+          name: ${{ env.COMMIT_SUBJECT }}
+          gzip: false
+          files: >
+            ipk/enigma2-plugin-extensions-neoboot_${{ env.PKGV }}_all.ipk

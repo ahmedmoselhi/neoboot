@@ -493,11 +493,11 @@ def NEOBootMainEx(
                 (media,
                  target))
             rc = os.system(cmd)
-        if os.path.exists("" + extensions_path + "AlternativeSoftCamManager"):
+        if os.path.exists("" + extensions_path + "NeoBoot"):
             cmd = (
                 "cp -af " +
                 extensions_path +
-                "AlternativeSoftCamManager %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions > /dev/null 2>&1" %
+                "NeoBoot %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions > /dev/null 2>&1" %
                 (media,
                  target))
             rc = os.system(cmd)
@@ -2277,11 +2277,11 @@ def NEOBootMainEx(
                 (media,
                  target))
             rc = os.system(cmd)
-        if os.path.exists("" + extensions_path + "AlternativeSoftCamManager"):
+        if os.path.exists("" + extensions_path + "NeoBoot"):
             cmd = (
                 "cp -af " +
                 extensions_path +
-                "AlternativeSoftCamManager %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions > /dev/null 2>&1" %
+                "NeoBoot %s/ImageBoot/%s/usr/lib/enigma2/python/Plugins/Extensions > /dev/null 2>&1" %
                 (media,
                  target))
             rc = os.system(cmd)

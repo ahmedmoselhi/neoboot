@@ -1,0 +1,12 @@
+Package: enigma2-plugin-extensions-neoboot
+Version:
+Description: enigma2-plugin-extensions-neoboot
+ Install Multiple enigma2 images on flash usb
+Section: base
+Priority: optional
+Depends: enigma2
+Maintainer: gutosie / ahmedmoselhi <ahmedmoselhi55@gmail.com>
+License: none
+Architecture: all
+OE: enigma2-plugin-extensions-neoboot
+Homepage: https://github.com/ahmedmoselhi/neoboot

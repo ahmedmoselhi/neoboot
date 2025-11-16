@@ -1,0 +1,3 @@
+#!/bin/bash
+echo 'Installing Package : NeoBoot ...'
+exit 0

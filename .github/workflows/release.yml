@@ -1,0 +1,52 @@
+name: Release tar.gz
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version from ver.txt
+        id: get_version
+        run: |
+          if [ -f "ver.txt" ]; then
+            VERSION=$(cat ver.txt | head -n 1 | tr -d '[:space:]')
+            echo "::notice::Version read from ver.txt: $VERSION"
+            echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::The 'ver.txt' file was not found in the repository root. Cannot proceed."
+            exit 1
+          fi
+
+      - name: Create release tar.gz file (NeoBoot only)
+        id: create_archive
+        run: |
+          PY_VERSION="3.13.9"
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          FILENAME="NeoBoot_${VERSION}_${PY_VERSION}.tar.gz"
+          if [ ! -d "NeoBoot" ]; then
+            echo "::error::The 'NeoBoot' directory was not found in the repository root. Cannot create archive."
+            exit 1
+          fi
+          echo "Creating archive: $FILENAME"
+          tar -czf $FILENAME NeoBoot
+          echo "ARCHIVE_FILENAME=${FILENAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.get_version.outputs.VERSION }}"
+          name: "Release v${{ steps.get_version.outputs.VERSION }}"
+          draft: false
+          prerelease: false
+          files: ${{ steps.create_archive.outputs.ARCHIVE_FILENAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
